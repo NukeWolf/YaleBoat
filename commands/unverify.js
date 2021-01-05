@@ -1,0 +1,23 @@
+const { mainGuild, roleId } = require('../config.json')
+module.exports = {
+    name: 'unverify',
+    description: 'Unverifys a user and unlinks their account to the ID',
+    dmOnly: true,
+    async execute(client,message,args,Users) {
+        
+        const rowCount = await Users.destroy({ where: { user_id: message.author.id } });
+        if (!rowCount) return message.reply('You aren\'t verified yet. Please do !verify to verify.')
+        const guild = await client.guilds.fetch(mainGuild)
+                .catch(e => {
+                    console.error(e)
+                    return message.reply("Error occurred attempting to set role.")
+                })
+        if(!guild.available) return message.reply("Server not available, please contact an admin.")
+            const guildMember = guild.member(message.author)
+            guildMember.roles.remove(roleId)
+
+        client.log("verification",`<@${message.author.id}> has been unverified.`,true,client)
+        return message.reply('Succesfully Unverified! You can now register another discord acount with this link, or do !verify to regain access to server.');
+
+    }
+}

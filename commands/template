@@ -1,0 +1,10 @@
+module.exports = {
+    name: 'unverify',
+    description: 'Unverifys a user and unlinks their account to the ID',
+    dmOnly: true,
+    execute(message,args,Users) {
+        if(!args.length) return message.channel.send(`You didn't pass through any link!`);
+        
+
+    }
+}
