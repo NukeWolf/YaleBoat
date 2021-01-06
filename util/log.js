@@ -1,6 +1,6 @@
 const winston = require('winston')
 const format = winston.format
-const { mainGuild, adminChannel } = require('../config.json')
+const { adminChannel } = require('../config.json')
 const logger = winston.createLogger({
     levels:{
         'info': 3,
@@ -19,7 +19,7 @@ const logger = winston.createLogger({
 const log = (type,message,sendDiscord,client) =>{
     logger.log(type,message)
     if(sendDiscord){
-        client.guilds.fetch(mainGuild).then(guild => {
+        client.getMainGuild().then(guild => {
             guild.channels.resolve(adminChannel).send(`[${type.toUpperCase()}] - ${message}`)
         })
     }

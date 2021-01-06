@@ -1,17 +1,25 @@
-const { mainGuild, roleId } = require('../config.json')
+
+/**
+ * @typedef {import('discord.js').Client} client
+ * @typedef {import('discord.js').Message} message
+ */
+
+const { roleId } = require('../config.json')
 module.exports = {
     name: 'unverify',
     description: 'Unverifys a user and unlinks their account to the ID',
     dmOnly: true,
+    /**
+     * Execute Function
+     * @param  {client} client
+     * @param  {message} message
+     * @param  {Array.<String>} args
+     */
     async execute(client,message,args,Users) {
         
         const rowCount = await Users.destroy({ where: { user_id: message.author.id } });
         if (!rowCount) return message.reply('You aren\'t verified yet. Please do !verify to verify.')
-        const guild = await client.guilds.fetch(mainGuild)
-                .catch(e => {
-                    console.error(e)
-                    return message.reply("Error occurred attempting to set role.")
-                })
+        const guild = await client.getMainGuild()
         if(!guild.available) return message.reply("Server not available, please contact an admin.")
             const guildMember = guild.member(message.author)
             guildMember.roles.remove(roleId)
