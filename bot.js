@@ -32,7 +32,11 @@ if (process.env.DATABASE_URL) {
         protocol: 'postgres',
         logging:  false, //false
         dialectOptions: {
-            ssl:true
+            ssl:{
+                require: true,
+                rejectUnauthorized: false
+            }
+            
         }
     })
 }
