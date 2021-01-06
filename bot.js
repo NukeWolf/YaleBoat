@@ -27,11 +27,7 @@ for (const file of commandFiles){
 //DB Setup
 var sequelize = null
 if (process.env.DATABASE_URL) {
-    sequelize = new Sequelize(process.env.DATABASE_URL, {
-        dialect:  'postgres',
-        protocol: 'postgres',
-        logging:  true //false
-    })
+    sequelize = new Sequelize(process.env.DATABASE_URL)
 }
 else{
     sequelize = new Sequelize('database', 'user', 'password', {
