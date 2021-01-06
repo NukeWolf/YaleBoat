@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Discord = require('discord.js');
 const Sequelize = require('sequelize')
-const {prefix,roleId, mainGuild} = require('./config.json')
+const {prefix, roleId, mainGuild} = require('./config.json')
 const inviteManager = require('./util/inviteManager')
 
 
@@ -25,13 +25,29 @@ for (const file of commandFiles){
 }
 
 //DB Setup
-const sequelize = new Sequelize('database', 'user', 'password', {
-	host: 'localhost',
-	dialect: 'sqlite',
-	logging: false,
-	// SQLite only
-	storage: 'database.sqlite',
-});
+var sequelize = null
+if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect:  'postgres',
+        protocol: 'postgres',
+        port:     match[4],
+        host:     match[3],
+        logging:  true //false
+    })
+}
+else{
+    sequelize = new Sequelize('database', 'user', 'password', {
+        host: 'localhost',
+        dialect: 'sqlite',
+        logging: false,
+        // SQLite only
+        storage: 'database.sqlite',
+    });
+}
+
+
+
+
 const Users = sequelize.define('users', {
 	user_id: {
 		type: Sequelize.STRING,
