@@ -3,9 +3,8 @@
  * @typedef {import('discord.js').Message} message
  */
 
-
 const filter = require('../util/filter')
-const { roleId } = require('../config.json');
+const { roleId } = require('../config');
 module.exports = {
     name: 'verify',
     description: 'Verifys a user along with an argument of a link',
@@ -16,7 +15,9 @@ module.exports = {
      * @param  {message} message
      * @param  {Array.<String>} args
      */
-    async execute(client,message,args, Users) {
+    async execute(message,args) {
+        const client = message.client
+        const Users = client.db.Users
         if(!args.length) return message.channel.send(`You didn't pass through any link!`);
         await new Promise(r => setTimeout(r, 2000));
         const link = args[0]

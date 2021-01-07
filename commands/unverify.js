@@ -4,7 +4,7 @@
  * @typedef {import('discord.js').Message} message
  */
 
-const { roleId } = require('../config.json')
+const { roleId } = require('../config')
 module.exports = {
     name: 'unverify',
     description: 'Unverifys a user and unlinks their account to the ID',
@@ -15,8 +15,9 @@ module.exports = {
      * @param  {message} message
      * @param  {Array.<String>} args
      */
-    async execute(client,message,args,Users) {
-        
+    async execute(message,args) {
+        const client = message.client
+        const Users = message.client.db.Users
         const rowCount = await Users.destroy({ where: { user_id: message.author.id } });
         if (!rowCount) return message.reply('You aren\'t verified yet. Please do !verify to verify.')
         const guild = await client.getMainGuild()

@@ -8,7 +8,7 @@ function isValidMd5($md5 = '')
 
 async function isSimilar(uuid,Users){
     //If there are less different amount of letters than this amount, there's something wrong.
-    const suspiciousLetterCount = 16
+    const suspiciousLetterCount = 17
     const uuidList = await Users.findAll({ attributes: ['uuid']})
     return uuidList.some(user => {
         dbUser = user.uuid.split('')

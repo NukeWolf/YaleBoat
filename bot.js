@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Discord = require('discord.js');
 const Sequelize = require('sequelize')
-const {prefix, roleId, mainGuild} = require('./config.json')
+const {prefix, roleId, mainGuild} = require('./config')
 const inviteManager = require('./util/inviteManager')
 
 
@@ -9,6 +9,7 @@ const inviteManager = require('./util/inviteManager')
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.log = require('./util/log')
+
 //MainGuild
 client.getMainGuild = () => { return client.guilds.fetch(mainGuild)
     .catch(e => {
@@ -50,9 +51,6 @@ else{
     });
 }
 
-
-
-
 const Users = sequelize.define('users', {
 	user_id: {
 		type: Sequelize.STRING,
@@ -69,25 +67,22 @@ const Users = sequelize.define('users', {
     },
 });
 
-
+client.db = {Users , sequelize}
 
 
 client.once('ready', () =>{
     Users.sync();
     client.log("info","Bot is now Online!",true,client)
     client.inviteManager = new inviteManager(client)
-
 })
 
 client.on('inviteCreate', invite => {
     client.inviteManager.onInviteCreate(invite)
 })
 
-
 client.on('guildMemberAdd', async member => {
     //Check Invite and update accordingly
     client.inviteManager.onUserJoin(member)
-
     //Apropriate Welcome message based on verification database.
     const user = await Users.findOne({ where: { user_id: member.id } });
     if(user){
@@ -115,7 +110,6 @@ client.on('guildMemberAdd', async member => {
             .setFooter('*Your link may look a little different. UUIDv1');
         member.send(embed)
     }
-    
 })
 
 client.on('message', async message =>{
@@ -131,7 +125,7 @@ client.on('message', async message =>{
     if(user && user.get('malicious')) return message.reply("There was an issue verifying your ID. Please contact an Admin for further assistance.");
 
     try{
-        command.execute(client,message,args,Users);
+        command.execute(message,args);
     }
     catch (err){
         client.log('error',err);

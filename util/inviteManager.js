@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const { adminChannel } = require('../config.json')
+const { adminChannel } = require('../config')
 
 /**
  * @param  {import('discord.js').Client} client

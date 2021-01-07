@@ -1,6 +1,6 @@
 const winston = require('winston')
 const format = winston.format
-const { adminChannel } = require('../config.json')
+const { adminChannel } = require('../config')
 const logger = winston.createLogger({
     levels:{
         'info': 3,
