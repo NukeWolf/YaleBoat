@@ -103,8 +103,9 @@ client.on('guildMemberAdd', async member => {
             .setDescription("In order to verify your account, we will need the link to your acceptance letter.")
             .addField('Login to your portal at the link below and once logged in, copy the URL in the search bar.', '[https://apps.admissions.yale.edu/apply/update](https://apps.admissions.yale.edu/apply/update)')
             .addField('After copying the link, respond to this dm with the command !verify [URL]',"Ex. !verify https://apps.admissions.yale.edu/apply/update?idtoken=4101bef8794fed986e95dfb54850c68b")
-            .addField('If the link says, "No update to your application status to report", use this alternative link below and navigate to the letter yourself.', '[https://apps.admissions.yale.edu/apply](https://apps.admissions.yale.edu/apply)')
+            .addField('If the link says, "No update to your application status to report", use this alternative link below and navigate to the acceptance letter yourself, and then copy the URL.', '[https://apps.admissions.yale.edu/apply](https://apps.admissions.yale.edu/apply)')
             .addField('Privacy', 'This ID you give is not linked to any of your personal information, nor allows to do anything with the application. It only tells us if your application exists.')
+            .addField('Contact and Help',"If you need help with any of this, or can't access your portal, DM any of the admins on the server for verification help / admited role.")
             .setImage('attachment://bulldog.jpg')
             .setTimestamp()
             .setFooter('*Your link may look a little different. UUIDv1');
