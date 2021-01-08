@@ -120,17 +120,23 @@ client.on('message', async message =>{
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
-    if(!client.commands.has(commandName)) return;
-    
-    const command = client.commands.get(commandName)
+    //Finds Commands and exits early if no alias is found.
+    const cmd = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases.includes(commandName))
+    if(!cmd) return;
+
     //Checks for DM Only
-    if(command.dmOnly && message.channel.type !== 'dm') return;
+    if(cmd.dmOnly && message.channel.type !== 'dm') return;
     //Malicious Check
     const user = await Users.findOne({ where: { user_id: message.author.id } });
     if(user && user.get('malicious')) return message.reply("There was an issue verifying your ID. Please contact an Admin for further assistance.");
 
+    //Permission Check
+    if(cmd.permissions){
+        if(!message.member || !message.member.permissionsIn(message.channel).has(cmd.permissions))return;
+    }
+
     try{
-        command.execute(message,args);
+        cmd.execute(message,args);
     }
     catch (err){
         client.log('error',err);

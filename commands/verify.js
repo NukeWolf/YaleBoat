@@ -7,6 +7,7 @@ const filter = require('../util/filter')
 const { roleId } = require('../config');
 module.exports = {
     name: 'verify',
+    aliases:[],
     description: 'Verifys a user along with an argument of a link',
     dmOnly: true,
     /**

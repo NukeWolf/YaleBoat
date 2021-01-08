@@ -7,6 +7,7 @@
 const { roleId } = require('../config')
 module.exports = {
     name: 'unverify',
+    aliases:[],
     description: 'Unverifys a user and unlinks their account to the ID',
     dmOnly: true,
     /**
@@ -19,7 +20,7 @@ module.exports = {
         const client = message.client
         const Users = message.client.db.Users
         const rowCount = await Users.destroy({ where: { user_id: message.author.id } });
-        if (!rowCount) return message.reply('You aren\'t verified yet. Please do !verify to verify.')
+        if (!rowCount) return message.reply('You aren\'t verified yet. Please do !verify <URL> to verify.')
         const guild = await client.getMainGuild()
         if(!guild.available) return message.reply("Server not available, please contact an admin.")
             const guildMember = guild.member(message.author)

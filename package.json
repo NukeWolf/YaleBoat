@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "discord.js": "^12.5.1",
     "pg": "^8.5.1",
     "sequelize": "^6.3.5",
