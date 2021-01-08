@@ -72,7 +72,7 @@ client.db = {Users , sequelize}
 
 client.once('ready', () =>{
     Users.sync();
-    client.log("info","Bot is now Online!",true,client)
+    client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
 })
 
@@ -104,12 +104,15 @@ client.on('guildMemberAdd', async member => {
             .addField('Login to your portal at the link below and once logged in, copy the URL in the search bar.', '[https://apps.admissions.yale.edu/apply/update](https://apps.admissions.yale.edu/apply/update)')
             .addField('After copying the link, respond to this dm with the command !verify [URL]',"Ex. !verify https://apps.admissions.yale.edu/apply/update?idtoken=4101bef8794fed986e95dfb54850c68b")
             .addField('If the link says, "No update to your application status to report", use this alternative link below and navigate to the acceptance letter yourself, and then copy the URL.', '[https://apps.admissions.yale.edu/apply](https://apps.admissions.yale.edu/apply)')
-            .addField('Privacy', 'This ID you give is not linked to any of your personal information, nor allows to do anything with the application. It only tells us if your application exists.')
+            .addField('Privacy', 'The ID you give is not linked to any of your personal information, nor does it allows us access or modify with the application. Its only purpose is to check if your application exists.')
             .addField('Contact and Help',"If you need help with any of this, or can't access your portal, DM any of the admins on the server for verification help / admited role.")
             .setImage('attachment://bulldog.jpg')
             .setTimestamp()
             .setFooter('*Your link may look a little different. UUIDv1');
         member.send(embed)
+            .catch(e => {
+                client.log("error", "Couldn't send welcome verification/message to "+member.toString()+".",true)
+            })
     }
 })
 
@@ -118,8 +121,9 @@ client.on('message', async message =>{
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     if(!client.commands.has(commandName)) return;
+    
     const command = client.commands.get(commandName)
-
+    //Checks for DM Only
     if(command.dmOnly && message.channel.type !== 'dm') return;
     //Malicious Check
     const user = await Users.findOne({ where: { user_id: message.author.id } });

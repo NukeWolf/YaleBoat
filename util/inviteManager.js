@@ -62,7 +62,7 @@ module.exports = class inviteManager{
             })
             .catch(e => {
                 client.log("error",e)
-                client.log("info","InviteManager failed to load.",true,client)
+                client.log("info","InviteManager failed to load.",true)
             })
     }
     /**

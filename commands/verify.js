@@ -21,16 +21,18 @@ module.exports = {
         if(!args.length) return message.channel.send(`You didn't pass through any link!`);
         await new Promise(r => setTimeout(r, 2000));
         const link = args[0]
+
         const uuid = await filter(link,Users)
         try {
             if(!uuid.valid){
                 if(uuid.malicious){
                     await Users.create({user_id:message.author.id,rawLink:link, malicious:true})
                     //Log the User
-                    client.log('malicious',`**<@${message.author.id}> __is potentially malicious due to suspicious link entry. Request further verification.__\n - Link: ${link} \n - Reason: ${uuid.reason}**`,true,client)
+                    client.log('malicious',`**<@${message.author.id}> __is potentially malicious due to suspicious link entry. Request further verification.__\n - Link: ${link} \n - Reason: ${uuid.reason}**`,true)
                 }
                 return message.reply(uuid.error || "Error occurred.")
             }
+            //If valid, Attempt to add them to DB
             const user = await Users.create({
                 user_id:message.author.id,
                 uuid: uuid.uuid,
@@ -41,13 +43,14 @@ module.exports = {
                 await Users.destroy({ where: { user_id: message.author.id } });
                 return message.reply("Server is not available, please try again later.")
             };
+            //Add Role
             const guildMember = guild.member(message.author)
             guildMember.roles.add(roleId)
 
             client.log("verification",`<@${message.author.id}> has been verified.`,true,client)
             
 
-            return message.reply("**ID succesfully activated!** You now have access to the server! Please make sure to read rules and set your roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**")
+            return message.reply("**ID succesfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**")
         }
         catch (e){
             if (e.name === 'SequelizeUniqueConstraintError'){

@@ -25,7 +25,7 @@ module.exports = {
             const guildMember = guild.member(message.author)
             guildMember.roles.remove(roleId)
 
-        client.log("verification",`<@${message.author.id}> has been unverified.`,true,client)
+        client.log("verification",`<@${message.author.id}> has been unverified.`,true)
         return message.reply('Succesfully Unverified! You can now register another discord acount with this link, or do !verify to regain access to server.');
 
     }

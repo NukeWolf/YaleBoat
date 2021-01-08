@@ -16,10 +16,10 @@ const logger = winston.createLogger({
 	format: format.combine(format.timestamp(),format.printf(log => `${log.timestamp} [${log.level.toUpperCase()}] - ${log.message}`)),
 });
 
-const log = (type,message,sendDiscord,client) =>{
+function log(type,message,sendDiscord) {
     logger.log(type,message)
     if(sendDiscord){
-        client.getMainGuild().then(guild => {
+        this.getMainGuild().then(guild => {
             guild.channels.resolve(adminChannel).send(`[${type.toUpperCase()}] - ${message}`)
         })
     }
