@@ -11,8 +11,7 @@ const invite = (client) =>{
 }
 
 function formatTime(unix,delim = "\n"){
-    var date = new Date(unix)
-    date.toLocaleString("en-US", {timeZone: "America/New_York"})
+    var date = new Date(new Date(unix).toLocaleString("en-US", {timeZone: "America/New_York"}))
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     // Hours part from the timestamp
     var hours = date.getHours();
