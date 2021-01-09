@@ -10,7 +10,10 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.log = require('./util/log')
 
-//MainGuild
+/**
+ * Gets the main Yale 2025 Guild
+ * @returns {Discord.Guild} 
+ */
 client.getMainGuild = () => { return client.guilds.fetch(mainGuild)
     .catch(e => {
         client.log('error',e)
