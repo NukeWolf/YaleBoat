@@ -1,4 +1,3 @@
-const Discord = require('discord.js')
 const { adminChannel } = require('../config')
 
 /**
@@ -42,7 +41,7 @@ const createInviteEmbed = (invite) => {
             { name: 'Channel', value: invite.channel.toString() , inline: true },
         )
         .addField("Users joined through this invite:","None")
-        .setFooter('Created • '+createDate);
+        .setFooter('EST | Created • '+createDate);
 }
 
 
@@ -65,6 +64,7 @@ module.exports = class inviteManager{
             })
     }
     /**
+     * Adds the member to the invite log when joined and tracks which invite link they used, by comparing a old cached list of invites with a new invite list.
     * @param  {import('discord.js').GuildMember} member
     */
     onUserJoin = async member =>{

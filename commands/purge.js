@@ -1,7 +1,7 @@
 module.exports = {
     name: 'purge',
     aliases:['clear'],
-    description: 'Mass deletes a list of messages',
+    description: 'Mass deletes a number of most recent messages. Can also select a person to only delete.',
     permissions: ['MANAGE_MESSAGES'], 
     /**
      * @param  {import('discord.js').Message} message
