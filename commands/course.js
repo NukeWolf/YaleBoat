@@ -19,6 +19,8 @@ module.exports = {
                 if(!args.length) return message.channel.send({embed:searchEmbed()});
                 //Setups parameters. Apifields are query parameters optional by the api.
                 const apiFields = []
+                let term = '';
+                //Finds additional parameters indicators
                 const indexes = args.reduce((acc,val,index)=>{
                     return (val in searchParameters)? [...acc,index] : acc
                 },[]);
@@ -42,15 +44,26 @@ module.exports = {
                     //Check if there is actually a parameter between parameter indicators
                     if(param.apiFields && !indexes.includes(argIndex+1)){
                         const value = args.slice(argIndex+1,indexes[index+1]).join(" ");
-                        console.log(value)
                         apiFields.push({
                             'field': param.field,
                             value
                         })
                     }
+                    //Handles Term Var
+                    if(param.field=='term' && !indexes.includes(argIndex+1)){
+                        const value = args.slice(argIndex+1,indexes[index+1]).join(" ");
+                        if(value in param.options){
+                            term = param.options[value]
+                        }
+                    }
                 })
-                console.log(apiFields)
-                const object = new CourseList({apiFields},message.channel)
+                //Defaults for values not instantiated
+                if(!term){
+                    term = searchParameters['-t'].default
+                }
+
+                //Create new CourseList
+                const object = new CourseList({apiFields,term},message.channel)
                 object.init()
             default:
                 //Help Message
@@ -59,6 +72,17 @@ module.exports = {
 }
 //Search Parameters that are usable
 const searchParameters = {
+    '-t':{
+        field:'term',
+        name:'Term/Semester',
+        description: `Selects which term you want to look up. The default is set to Fall 2020 Automatically. You can set it to spring 2021 by adding "spring" after this parameter.\n`,
+        options:{
+            'fall':"202003",
+            'spring':'202101'
+        },
+        default:202003,
+        required:true
+    },
     '-s':{
         field:'subject',
         name:'Subject of Study',
@@ -97,7 +121,7 @@ const searchEmbed = () => {
         'color':0x0a47b8,
         fields,
         footer:{
-            text:`This Feature uses the [courses.yale.edu](https://courses.yale.edu/) API`,
+            text:`This Feature uses the https://courses.yale.edu/ API`,
         }
     }
 }

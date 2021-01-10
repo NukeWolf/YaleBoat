@@ -1,13 +1,5 @@
 const { adminChannel } = require('../config')
-
-/**
- * @param  {import('discord.js').Client} client
- */
-const invite = (client) =>{
-    client.on('inviteCreate', invite => {
-        
-    })
-}
+const Discord = require('discord.js')
 
 function formatTime(unix,delim = "\n"){
     var date = new Date(new Date(unix).toLocaleString("en-US", {timeZone: "America/New_York"}))
