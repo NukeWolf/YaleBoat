@@ -24,7 +24,6 @@ module.exports = class DiscordCourseList{
         // # TODO: Make Sure to add fields to this fetch statement when needed
         // # TODO: Do something when the api returns no courses back
         this.courses = await YaleApi.fetchCourseList(this.parameters.apiFields)
-        console.log("Recieved Courses")
         this.reloadEmbed()
         //Loads all the courses in the background
 
@@ -42,9 +41,7 @@ module.exports = class DiscordCourseList{
     }
     async reloadEmbed(){
         const currentCourse = this.currentPage*maxCourses
-        console.log(this.courses.length)
         const embed = await courseListEmbed(this.courses.slice(currentCourse,currentCourse+maxCourses),this.currentPage,this.courses.length)
-        console.log("Sending Back Message",embed)
         this.msg.edit({embed})
     }
     //Goes to next page if possible and reloads the embed
@@ -68,7 +65,6 @@ module.exports = class DiscordCourseList{
  * @returns {Object}
  */
 const courseListEmbed = async (courses,currentPage,coursesTotal) => {
-    console.log(courses.length)
     var currentCourse = 1;
     let fields = courses.map(async course => {
         const num = currentCourse
