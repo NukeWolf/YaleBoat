@@ -21,7 +21,7 @@ module.exports = class DiscordCourse{
 
         this.reactionCollector.on('collect',(reaction,user) => { 
             emojis[reaction.emoji.name](this,user)
-            if(!this.channel.type == "dm") reaction.users.remove(user);
+            if(this.channel.type !== "dm") reaction.users.remove(user);
         })
 
         for (const emoji in emojis){
@@ -43,6 +43,7 @@ module.exports = class DiscordCourse{
     }
     async saveCourse(user){
         try{
+            //Checks if course is selected
             if(!this.course) return user.send("**Courses:** `Course not selected. Please select a course first by reacting to a number.`");
             const Users = this.client.db.Users
             const course = {
@@ -59,14 +60,14 @@ module.exports = class DiscordCourse{
             else{
                 const oldCourses = await userDB.get('courses')
                 if(oldCourses) {
+                    //Checks if course is in your list already.
                     if(oldCourses.some(old => old.code === course.code && old.term === course.term)) return user.send("**Courses:** `This course is already saved.`")
                     else userDB.set('courses',[...oldCourses,course]);
                 } 
                 else userDB.set('courses',[course])
                 await userDB.save()
             }
-            // TODO Instructions on how to get courses when that is availible.
-            return user.send(`**Courses:** \`The course "${course.code}" has been saved.\``)
+            return user.send(`**Courses:** \`The course "${course.code}" has been saved. Access saved courses with !course worksheet\``)
         }
         catch(e){
             this.client.log('error',e)

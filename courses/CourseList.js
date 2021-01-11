@@ -24,7 +24,13 @@ module.exports = class DiscordCourseList{
         this.detailedCourse.init()
         // # TODO: Make Sure to add fields to this fetch statement when needed
         // # TODO: Do something when the api returns no courses back
-        this.courses = await YaleApi.fetchCourseList(this.parameters.apiFields,this.parameters.term)
+        if(this.parameters.courses){
+            this.courses = this.parameters.courses.map(course => new YaleApi.Course(course.code,course.term))
+        }
+        else{
+            this.courses = await YaleApi.fetchCourseList(this.parameters.apiFields,this.parameters.term)
+        }
+        
         this.reloadEmbed()
         //Loads all the courses in the background
         this.courses.forEach(course => course.init())
@@ -36,7 +42,7 @@ module.exports = class DiscordCourseList{
         })
         this.reactionCollector.on('collect',(reaction,user) => { 
             emojis[reaction.emoji.name](this)
-            if(!this.channel.type == "dm") reaction.users.remove(user);
+            if(this.channel.type !== "dm") reaction.users.remove(user);
         })
         //Adding Reactions
         for (const emoji in emojis){
@@ -86,7 +92,7 @@ const courseListEmbed = async (courses,currentPage,coursesTotal) => {
         await course.init()
         const meetingTimes = course.meetingTimes || "~~HTBA~~"
         let instructor = (course.instructor === "Varies by section") ? "Varies by Section":`[${course.instructor}](https://directory.yale.edu/?queryType=term&pattern=${encodeURI(course.instructor)})`
-        if (course.instructor == "~~None~~") instructor = course.instructor;
+        if (course.instructor === "~~None~~") instructor = course.instructor;
         const fields = [
             {
                 name:`**${num}. __${course.code} - ${course.title}__**`,

@@ -1,4 +1,5 @@
 const CourseList = require('../courses/CourseList')
+const getCriteria = require('../apis/YaleCourses').getCriteria
 
 module.exports = {
     name: 'course',
@@ -9,13 +10,11 @@ module.exports = {
      * @param  {Array<String>} args
      */
     async execute(message,args) {
-        // TODO Create Help Message
         if(!args.length) return message.channel.send({embed:helpEmbed});
         const action = args.shift().toLowerCase()
 
         switch(action){
             case "search":
-                //TODO Add Search Help Message
                 if(!args.length) return message.channel.send({embed:searchEmbed()});
                 //Setups parameters. Apifields are query parameters optional by the api.
                 const apiFields = []
@@ -50,7 +49,7 @@ module.exports = {
                         })
                     }
                     //Handles Term Var
-                    if(param.field=='term' && !indexes.includes(argIndex+1)){
+                    if(param.field ==='term' && !indexes.includes(argIndex+1)){
                         const value = args.slice(argIndex+1,indexes[index+1]).join(" ");
                         if(value in param.options){
                             term = param.options[value]
@@ -65,11 +64,26 @@ module.exports = {
                 //Create new CourseList
                 message.courses = new CourseList({apiFields,term},message.channel)
                 message.courses.init()
+                break;
             case "worksheet":
                 const Users = message.client.db.Users
                 const user = await Users.findOne({ where: { user_id: message.author.id } });
                 if(!user || !user.get('courses')) return message.author.send("**Courses:** `No worksheet found. Do !course search to find courses.`");
-
+                const courses = user.get('courses')
+                message.courses = new CourseList({courses},message.channel)
+                message.courses.init()
+                break;
+            // TODO Make a bit more dynamic
+            case "departments":
+                const {departments} = await getCriteria()
+                message.author.send({embed:optionsEmbed("Departments",departments)})
+                if(message.channel.type !== 'dm')message.reply("```Sent options to your dms.```");
+                break;
+            case "subjects":
+                const {subjects} = await getCriteria()
+                message.author.send({embed:optionsEmbed("subjects",subjects)})
+                if(message.channel.type !== 'dm')message.reply("```Sent options to your dms.```");
+                break;
             default:
                 message.reply({embed:helpEmbed})
         }
@@ -91,13 +105,13 @@ const searchParameters = {
     '-s':{
         field:'subject',
         name:'Subject of Study',
-        description:'Enter the corresponding 4-letter subject field\nEx. `"-s CPAR" for Computing in the Arts.`',
+        description:'Enter the corresponding 4-letter subject field\nEx. `"-s CPAR" for Computing in the Arts.`\nDo `!course subjects` for all options',
         apiFields:true,
     },
     '-d':{
         field:'dept',
         name:'Department',
-        description:'Enter the corresponding 4-letter department code\nEx. `"-d CPSC" for Computer Science Department.`',
+        description:'Enter the corresponding 4-letter department code\nEx. `"-d CPSC" for Computer Science Department.`\nDo `!course departments` for all options',
         apiFields:true
     },
     '-i':{
@@ -147,5 +161,56 @@ const helpEmbed = {
     ],
     footer:{
         text:`This Feature uses the https://courses.yale.edu/ API`,
+    }
+}
+
+const optionsEmbed = (title,arr) => {
+    let description
+    let fields = []
+    arr.reduce((acc,val,index,arr) => {
+        //This convoluted mess is because Discord Fields have a max field description of 1024 characters and description is max of 2048.
+        const reset = () => {
+            acc.string = '';
+            acc.count = 0;
+        }
+        const addString = () => {
+            if (index){
+                acc.string += val + '\n';
+                acc.count+=val.length + 2;
+            }
+            else{
+                acc.string += val + ' • ';
+                acc.count+=val.length + 3;
+            }
+        }
+        if(acc.count + val.length + 2 < 2048 && acc.first){
+            addString()
+            if (index != arr.length-1) return acc;
+        }
+        if(acc.count + val.length + 2 < 1024 && !acc.first){
+            addString()
+            if (index != arr.length-1) return acc;
+        }
+        if (acc.first){
+            description = acc.string
+            reset()
+            addString()
+            acc.first = false;
+        }
+        else {
+            fields.push({
+                name:"__More Options__",
+                value:acc.string
+            })
+            reset()
+            addString()
+        }
+        return acc
+    },{string:'',count:0,first:true})
+
+    return {
+        title:`Available ${title}`,
+        description:description,
+        fields
     }
 }

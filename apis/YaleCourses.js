@@ -44,7 +44,7 @@ async function fetchCourseList(fields,term) {
 
 
 class Course {
-    // # TODO - Implement get Course API
+    // # TODO - Implement get Course API with CDN
     constructor(code,termCode){
         this.code = code
         this.term = termCode
@@ -65,7 +65,6 @@ class Course {
         this.distributional = this.formatDistributional(rawData.yc_attrs) || ["~~None~~"]
         this.finalExam = rawData.final_exam
         this.hours = rawData.hours
-        // TODO Fix Additional Info Formatting
         this.additionalInfo = this.formatAdditionalInfo(rawData.ci_attrs)
         this.lastUpdated = rawData.last_updated
 
@@ -120,13 +119,17 @@ class Course {
         return Array.from(dom.querySelectorAll('a')).map(node=>node.textContent)
     }
 }
-const test = async() => {
-    const test = new Course("CPSC 035")
-    await test.init()
-    console.log(test.meetingTimes)
-    console.log(test.instructor)
-}
 
-//test()
-module.exports = {fetchCourseList}
+async function getCriteria() {
+    const url = "https://courses.yale.edu"
+    const response = await axios.get(url)
+    const dom = new JSDOM(response.data).window.document
+    const subjectNodes = dom.querySelector('#crit-subject').querySelectorAll('option') 
+    const subjects = Array.from(subjectNodes).map(node=>node.textContent)
+    const deptNodes = dom.querySelector('#crit-dept').querySelectorAll('option') 
+    const departments = Array.from(deptNodes).map(node=>node.textContent)
+    return {subjects,departments}
+} 
+
+module.exports = {fetchCourseList,getCriteria}
 module.exports.Course = Course
