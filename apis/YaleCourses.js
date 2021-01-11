@@ -1,6 +1,6 @@
 const axios = require('axios')
 var array = require('lodash/array');
-//const { JSDOM }= require('jsdom')
+const { JSDOM }= require('jsdom')
 
 
 /**
@@ -16,7 +16,7 @@ const api = axios.create({
  * @param  {Object} fields
  * @returns {Array<Course>} Array of Course Objects
  */
-async function fetchCourseList(fields,term="guide2020") {
+async function fetchCourseList(fields,term) {
     const params = {page:'fose',route:'search'}
     //Default Criteria only gets classes from Yale College
     const criteria = [
@@ -45,7 +45,6 @@ async function fetchCourseList(fields,term="guide2020") {
 
 class Course {
     // # TODO - Implement get Course API
-    // # TODO - Implement Yale Directory API
     constructor(code,termCode){
         this.code = code
         this.term = termCode
@@ -56,9 +55,29 @@ class Course {
 
         this.title = rawData.title
         this.sectionSize = rawData.groupSize
-        this.description = this.formatHTML(rawData.description)
+        
+        const {description,prerequisites} = this.formatDescription(rawData.description)
+        this.description = description
+        this.prerequisites = prerequisites
+
         this.meetingTimes = this.formatHTML(rawData.meeting_html)
-        this.instructor = this.formatInstructor(rawData.instructordetail_html)
+        this.instructor = this.formatInstructor(rawData.instructordetail_html) || "~~None~~"
+        this.distributional = this.formatDistributional(rawData.yc_attrs) || ["~~None~~"]
+        this.finalExam = rawData.final_exam
+        this.hours = rawData.hours
+        // TODO Fix Additional Info Formatting
+        this.additionalInfo = this.formatAdditionalInfo(rawData.ci_attrs)
+        this.lastUpdated = rawData.last_updated
+
+        this.sections = rawData.allInGroup.map(section =>{
+            return {
+                'no':section.no,
+                'crn':section.crn,
+                'instructor':section.instr,
+                'meetingTime':section.meets
+            }
+        })
+
 
         this.initialized = true
 
@@ -80,6 +99,25 @@ class Course {
     formatInstructor(text){
         const index = text.indexOf(`<div class="instructor-email">`)
         return (index !== -1) ? text.slice(0,index).replace(/<[^>]*>?/gm, ''):text.replace(/<[^>]*>?/gm, '')
+    }
+    formatDistributional(text){
+        if(!text) return
+        const dom = new JSDOM(text).window.document
+        const single = dom.querySelector('i')
+        return  (single) ? [single.textContent] : Array.from(dom.querySelectorAll('li')).map(node=>node.textContent)
+    }
+    formatDescription(text){
+        const dom = new JSDOM(text).window.document
+        let description = dom.querySelector('p')
+        description = (description) ? description.textContent : "No description"
+        let prerequisites = dom.querySelector('.prerequisites')
+        prerequisites = (prerequisites) ? prerequisites.textContent : "None"
+        return {description,prerequisites}
+    }
+    formatAdditionalInfo(text){
+        if(!text) return
+        const dom = new JSDOM(text).window.document
+        return Array.from(dom.querySelectorAll('a')).map(node=>node.textContent)
     }
 }
 const test = async() => {

@@ -75,7 +75,7 @@ const searchParameters = {
     '-t':{
         field:'term',
         name:'Term/Semester',
-        description: `Selects which term you want to look up. The default is set to Fall 2020 Automatically. You can set it to spring 2021 by adding "spring" after this parameter.\n`,
+        description: '__The default is set to Fall 2020 Automatically.__\n To change to Spring 2021, add `-t spring`.',
         options:{
             'fall':"202003",
             'spring':'202101'
@@ -101,7 +101,7 @@ const searchParameters = {
         description:"Search for a certain professor or instructor.",
         apiFields:true
     }
-    //TODO More Parameters, and custom parameters like distributional requirements, Same Professor
+
 }
 
 const searchEmbed = () => {
@@ -117,7 +117,7 @@ const searchEmbed = () => {
     ]
     return{
         title:'!Course Search - Help',
-        description:'Usage: `!course search <keywords> [additional parameters]`\nThis command allows you to search through previous Yale Courses. The keyword is completely optional as long as you put one of the additional parameters.\n\nEx. `!course search calculus -d MATH` - Searches for the keyword "Calculus" within the math department\nEx. `!course search -s CPSC` - Searches for Computer Science courses',
+        description:'Usage: `!course search <keywords> [additional parameters]`\nThis command allows you to search through previous Yale Courses. The keyword is completely optional as long as you put one of the additional parameters. There are plans to add the Fall 2021 semester when possible.\n\nEx. `!course search calculus -d MATH -t spring` - Searches for the keyword "Calculus" within the math department in spring semester.\nEx. `!course search -s CPSC` - Searches for Computer Science courses',
         'color':0x0a47b8,
         fields,
         footer:{

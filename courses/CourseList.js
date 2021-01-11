@@ -1,8 +1,8 @@
 
 const YaleApi = require('../apis/YaleCourses')
 const array = require('lodash/array');
-const emojis = require('./reactions');
-
+const emojis = require('./reactions').CourseList;
+const DiscordCourse = require('./DetailedCourse')
 const maxCourses = 6;
 
 
@@ -20,24 +20,31 @@ module.exports = class DiscordCourseList{
     }
     async init(){
         this.msg = await this.channel.send({embed:{title:"Loading Courses . . ."}})
-    
+        this.detailedCourse = new DiscordCourse(this.channel)
+        this.detailedCourse.init()
         // # TODO: Make Sure to add fields to this fetch statement when needed
         // # TODO: Do something when the api returns no courses back
-        this.courses = await YaleApi.fetchCourseList(this.parameters.apiFields)
+        this.courses = await YaleApi.fetchCourseList(this.parameters.apiFields,this.parameters.term)
         this.reloadEmbed()
         //Loads all the courses in the background
-
+        this.courses.forEach(course => course.init())
         //Adding Reactions
         for (const emoji in emojis){
             await this.msg.react(emoji)
         }
         //Creating reaction collectors and processing it
-        this.reactionCollector = this.msg.createReactionCollector(()=>true)
+        this.reactionCollector = this.msg.createReactionCollector((reaction)=>{
+            return reaction.emoji.name in emojis
+        })
+
         this.reactionCollector.on('collect',(reaction,user) => { 
             emojis[reaction.emoji.name](this)
             reaction.users.remove(user)
         })
-        this.courses.forEach(course => course.init())
+        //Intialize Reactions later for the detailed course embed
+        this.detailedCourse.initReactions()
+
+        // TODO Cleanup Object when Reaction Collector Expires
     }
     async reloadEmbed(){
         const currentCourse = this.currentPage*maxCourses
@@ -57,24 +64,28 @@ module.exports = class DiscordCourseList{
             this.reloadEmbed();
         }
     }
+    getDetails(num){
+        const currentCourseIndex = (this.currentPage)*maxCourses + num;
+        if( currentCourseIndex < this.courses.length) this.detailedCourse.setCourse(this.courses[currentCourseIndex]);
+    }
 
 }
+
 /**
  * Creates an embed object based on a given array of Courses
  * @param  {Array<YaleApi.Course>} courses
  * @returns {Object}
  */
 const courseListEmbed = async (courses,currentPage,coursesTotal) => {
+    // TODO Add a description with the serach terms provided
     var currentCourse = 1;
     let fields = courses.map(async course => {
         const num = currentCourse
         currentCourse +=1;
         await course.init()
         const meetingTimes = course.meetingTimes || "~~HTBA~~"
-        let instructor
-        if(course.instructor === "") instructor = "~~None~~";
-        else if(course.instructor === "Varies by section") instructor = "Varies by Section";
-        else instructor = `[${course.instructor}](https://directory.yale.edu/?queryType=term&pattern=${encodeURI(course.instructor)})` 
+        let instructor = (course.instructor === "Varies by section") ? "Varies by Section":`[${course.instructor}](https://directory.yale.edu/?queryType=term&pattern=${encodeURI(course.instructor)})`
+        if (course.instructor == "~~None~~") instructor = course.instructor;
         const fields = [
             {
                 name:`**${num}. __${course.code} - ${course.title}__**`,
