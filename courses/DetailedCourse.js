@@ -53,8 +53,8 @@ module.exports = class DiscordCourse{
             const userDB = await Users.findOne({ where: { user_id: user.id } });
             if(!userDB) {
                 await Users.create({
-                    user_id:message.author.id,
-                    course:[course]
+                    user_id:user.id,
+                    courses:[course]
                 })
             }
             else{

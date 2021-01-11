@@ -157,6 +157,14 @@ const helpEmbed = {
         {
             name: "__**!course worksheet**__",
             value: 'Usage: `!course worksheet`\n This command allows you to view your saved courses.'
+        },
+        {
+            name:"__**!course subjects**__",
+            value: 'Usage: `!course subjects`\n This command lists all available subjects.'
+        },
+        {
+            name:"__**!course departments**__",
+            value: 'Usage: `!course departments`\n This commands lists all available departments.'
         }
     ],
     footer:{
