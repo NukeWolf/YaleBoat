@@ -28,19 +28,20 @@ module.exports = class DiscordCourseList{
         this.reloadEmbed()
         //Loads all the courses in the background
         this.courses.forEach(course => course.init())
+        
+        
+        //Creating reaction collectors and processing it
+        this.reactionCollector = this.msg.createReactionCollector((reaction,user)=>{
+            return reaction.emoji.name in emojis && !user.bot
+        })
+        this.reactionCollector.on('collect',(reaction,user) => { 
+            emojis[reaction.emoji.name](this)
+            if(!this.channel.type == "dm") reaction.users.remove(user);
+        })
         //Adding Reactions
         for (const emoji in emojis){
             await this.msg.react(emoji)
         }
-        //Creating reaction collectors and processing it
-        this.reactionCollector = this.msg.createReactionCollector((reaction)=>{
-            return reaction.emoji.name in emojis
-        })
-
-        this.reactionCollector.on('collect',(reaction,user) => { 
-            emojis[reaction.emoji.name](this)
-            reaction.users.remove(user)
-        })
         //Intialize Reactions later for the detailed course embed
         this.detailedCourse.initReactions()
 

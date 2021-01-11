@@ -26,10 +26,13 @@ module.exports.CourseList = {
 }
 
 module.exports.DetailedCourse = {
-    "❌":(DetailedCourse) => {
+    "◀️":(DetailedCourse) => {
         DetailedCourse.close()
     },
     "💾":(DetailedCourse,user) => {
         DetailedCourse.saveCourse(user)
     },
+    "❌":(DetailedCourse,user) =>{
+        DetailedCourse.deleteCourse(user)
+    }
 }

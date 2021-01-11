@@ -115,7 +115,7 @@ class Course {
         return {description,prerequisites}
     }
     formatAdditionalInfo(text){
-        if(!text) return
+        if(!text) return []
         const dom = new JSDOM(text).window.document
         return Array.from(dom.querySelectorAll('a')).map(node=>node.textContent)
     }

@@ -21,8 +21,8 @@ module.exports = {
         const Users = client.db.Users
         if(!args.length) return message.channel.send(`You didn't pass through any link!`);
         await new Promise(r => setTimeout(r, 2000));
-        const link = args[0]
 
+        const link = args[0]
         const uuid = await filter(link,Users)
         try {
             if(!uuid.valid){
@@ -34,11 +34,21 @@ module.exports = {
                 return message.reply(uuid.error || "Error occurred.")
             }
             //If valid, Attempt to add them to DB
-            const user = await Users.create({
-                user_id:message.author.id,
-                uuid: uuid.uuid,
-                rawLink:link,
-            })
+            //Check if the user exists and they don't have a uuid
+            const user = await Users.findOne({ where: { user_id: message.author.id } });
+            if(user && !user.get('uuid')){
+                user.set('uuid',uuid.uuid)
+                user.set('rawLink',link)
+                await user.save()
+            }
+            else{
+                await Users.create({
+                    user_id:message.author.id,
+                    uuid: uuid.uuid,
+                    rawLink:link,
+                })
+            }
+            
             const guild = await client.getMainGuild()
             if(!guild.available){
                 await Users.destroy({ where: { user_id: message.author.id } });

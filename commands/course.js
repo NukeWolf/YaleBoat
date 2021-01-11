@@ -8,9 +8,9 @@ module.exports = {
      * @param  {import('discord.js').Message} message
      * @param  {Array<String>} args
      */
-    execute(message,args) {
+    async execute(message,args) {
         // TODO Create Help Message
-        if(!args.length) return message.channel.send({embed:searchEmbed()});
+        if(!args.length) return message.channel.send({embed:helpEmbed});
         const action = args.shift().toLowerCase()
 
         switch(action){
@@ -63,10 +63,15 @@ module.exports = {
                 }
 
                 //Create new CourseList
-                const object = new CourseList({apiFields,term},message.channel)
-                object.init()
+                message.courses = new CourseList({apiFields,term},message.channel)
+                message.courses.init()
+            case "worksheet":
+                const Users = message.client.db.Users
+                const user = await Users.findOne({ where: { user_id: message.author.id } });
+                if(!user || !user.get('courses')) return message.author.send("**Courses:** `No worksheet found. Do !course search to find courses.`");
+
             default:
-                //Help Message
+                message.reply({embed:helpEmbed})
         }
     }
 }
@@ -123,5 +128,24 @@ const searchEmbed = () => {
         footer:{
             text:`This Feature uses the https://courses.yale.edu/ API`,
         }
+    }
+}
+
+const helpEmbed = {
+    title:"**Course Commands**",
+    description:"A set of commands that allows you to search up yale courses with parameters, save courses, and view them later all through Discord.",
+    'color':0x0a47b8,
+    fields:[
+        {
+            name: '__**!course search**__',
+            value: 'Usage: `!course search <keywords> [additional parameters]`\n**Type *!course search* for additional details and parameters available.** This command allows you to search through previous Yale Courses. '
+        },
+        {
+            name: "__**!course worksheet**__",
+            value: 'Usage: `!course worksheet`\n This command allows you to view your saved courses.'
+        }
+    ],
+    footer:{
+        text:`This Feature uses the https://courses.yale.edu/ API`,
     }
 }

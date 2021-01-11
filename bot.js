@@ -29,6 +29,7 @@ for (const file of commandFiles){
 }
 
 //DB Setup
+
 var sequelize = null
 if (process.env.DATABASE_URL) {
     sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -68,6 +69,9 @@ const Users = sequelize.define('users', {
         type: Sequelize.BOOLEAN,
         defaultValue:false,
     },
+    courses: {
+        type: Sequelize.JSON,
+    }
 });
 
 client.db = {Users , sequelize}
@@ -86,19 +90,8 @@ client.on('inviteCreate', invite => {
 client.on('guildMemberAdd', async member => {
     //Check Invite and update accordingly
     client.inviteManager.onUserJoin(member)
-    //Apropriate Welcome message based on verification database.
-    const user = await Users.findOne({ where: { user_id: member.id } });
-    if(user){
-        if(user.get('malicious')){
-            member.send("Welcome to the Yale 2025 Discord Server!\nIn order to verify your account, please DM one of the admins for assistance.")
-        }
-        else{
-            member.roles.add(roleId)
-            member.send("Welcome back to the Yale 2025 Discord Server! Please reassign your roles.")
-        }
-    }
-    else{
-        const embed = new Discord.MessageEmbed()
+
+    const welcomeEmbed = new Discord.MessageEmbed()
             .attachFiles(['./src/bulldog.jpg'])
             .setColor('#0a47b8')
             .setTitle('Welcome to the Yale 2025 discord server!')
@@ -112,11 +105,31 @@ client.on('guildMemberAdd', async member => {
             .setImage('attachment://bulldog.jpg')
             .setTimestamp()
             .setFooter('*Your link may look a little different. UUIDv1');
-        member.send(embed)
+    //Apropriate Welcome message based on verification database.
+    const user = await Users.findOne({ where: { user_id: member.id } });
+    if(user){
+        if(user.get('malicious')){
+            member.send("Welcome to the Yale 2025 Discord Server!\nIn order to verify your account, please DM one of the admins for assistance.")
+        }
+        else if (user.get('uuid')){
+            member.roles.add(roleId)
+            member.send("Welcome back to the Yale 2025 Discord Server! Please reassign your roles.")
+        }
+        else{
+        member.send(welcomeEmbed)
             .catch(e => {
                 client.log("error", "Couldn't send welcome verification/message to "+member.toString()+".",true)
             })
+        }
     }
+    else {
+        member.send(welcomeEmbed)
+            .catch(e => {
+                client.log("error", "Couldn't send welcome verification/message to "+member.toString()+".",true)
+            })
+    }   
+        
+    
 })
 
 client.on('message', async message =>{
