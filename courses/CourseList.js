@@ -33,8 +33,7 @@ module.exports = class DiscordCourseList{
         
         this.reloadEmbed()
         //Loads all the courses in the background
-        this.courses.forEach(course => course.init())
-        
+        this.loadNextPages()
         
         //Creating reaction collectors and processing it
         this.reactionCollector = this.msg.createReactionCollector((reaction,user)=>{
@@ -58,11 +57,16 @@ module.exports = class DiscordCourseList{
         const embed = await courseListEmbed(this.courses.slice(currentCourse,currentCourse+maxCourses),this.currentPage,this.courses.length)
         this.msg.edit({embed})
     }
+    loadNextPages(){
+        const currentCourse = this.currentPage*maxCourses
+        this.courses.slice(currentCourse+maxCourses,currentCourse+(maxCourses*3)).forEach(course=>course.init())
+    }
     //Goes to next page if possible and reloads the embed
     nextPage(){
         if((this.currentPage+1)*maxCourses < this.courses.length){
             this.currentPage+=1;
             this.reloadEmbed();
+            this.loadNextPages()
         }
     }
     previousPage(){

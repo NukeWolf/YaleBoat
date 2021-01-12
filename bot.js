@@ -78,6 +78,7 @@ client.db = {Users , sequelize}
 
 
 client.once('ready', () =>{
+    client.user.setPresence({ activity: { name: 'Try !course in DMs' }})
     Users.sync();
     client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
