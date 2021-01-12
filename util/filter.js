@@ -28,8 +28,8 @@ filter = async (link,Users) => {
     if(isValidMd5(uuid)) return {valid:false,error:"There was an issue verifying your ID. Please contact an Admin for further assistance.",malicious:true,reason:"Used md5 hash in example link."};
     if(!validate(uuid)) return {valid:false,error:"Invalid ID, please make sure the link you pasted isn't truncated or modified.",malicious:false};
     if(!(version(uuid) === 4)) return {valid:false,error:"There was an issue verifying your ID. Please contact an Admin for further assistance.",malicious:true,reason:"Used a version of UUID other than 4"};
-    const similarity = await isSimilar(uuid,Users)
-    if(similarity) return {valid:false,error:"There was an issue verifying your ID. Please contact an Admin for further assistance.",malicious:true,reason:"Too similar to another id"};
+    //const similarity = await isSimilar(uuid,Users)
+    //if(similarity) return {valid:false,error:"There was an issue verifying your ID. Please contact an Admin for further assistance.",malicious:true,reason:"Too similar to another id"};
 
     
     return {valid:true,uuid,malicious:false};

@@ -133,3 +133,5 @@ async function getCriteria() {
 
 module.exports = {fetchCourseList,getCriteria}
 module.exports.Course = Course
+
+
