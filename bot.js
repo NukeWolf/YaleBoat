@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 const Sequelize = require('sequelize')
 const {prefix, roleId, mainGuild} = require('./config')
 const inviteManager = require('./util/inviteManager')
-
+const stateManager = require('./util/stateManager')
 
 
 const client = new Discord.Client();
@@ -14,12 +14,14 @@ client.log = require('./util/log')
  * Gets the main Yale 2025 Guild
  * @returns {Discord.Guild} 
  */
-client.getMainGuild = () => { return client.guilds.fetch(mainGuild)
+function getMainGuild() { 
+    return client.guilds.fetch(mainGuild)
     .catch(e => {
         client.log('error',e)
         return message.reply("Error occurred attempting to set role.")
     })
 }
+client.getMainGuild = getMainGuild
 
 //Command Setup
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -76,12 +78,15 @@ const Users = sequelize.define('users', {
 
 client.db = {Users , sequelize}
 
-
-client.once('ready', () =>{
+/**
+ * @param {Discord.Guild} guild
+ */
+client.once('ready', async () =>{
     client.user.setPresence({ activity: { name: 'Try !course in DMs' }})
     Users.sync();
     client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
+    client.stateManager = new stateManager(client)
 })
 
 client.on('inviteCreate', invite => {
