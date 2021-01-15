@@ -32,7 +32,8 @@ const setupStateRoles = async (message) => {
     Object.entries(stateAbbreviations).forEach( state => {
         guild.roles.create({
             data:{
-                name:state[1]
+                name:state[1],
+                mentionable:true
             },
         })
     })
@@ -41,7 +42,7 @@ const setupStateRoles = async (message) => {
 
 const deleteStateRoles = async (message) => {
     const guild = await message.client.getMainGuild()
-    stateAbbreviations.forEach( state => {
+    Object.values(stateAbbreviations).forEach( state => {
         const role = guild.roles.cache.find(role => state === role.name)
         if(role) role.delete()
         .catch(e =>{
