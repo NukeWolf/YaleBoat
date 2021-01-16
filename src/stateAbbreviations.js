@@ -1,3 +1,4 @@
+//B Q, Only U in UTAH Does not exist
 module.exports = {
     "AL": "Alabama",
     "AK": "Alaska",

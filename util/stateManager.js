@@ -69,6 +69,7 @@ module.exports = class StateManager{
         else if(emojiIdentifier === "%E2%9D%8C") return "clear"; 
     }
     /**
+     * Based on the users current "state" (get it? pun), it'll handle adding the state or storing the data.
      * @param  {String} char
      * @param  {import('discord.js').User} user
      */
@@ -98,7 +99,7 @@ module.exports = class StateManager{
                     })
             }
             else{
-                user.send("**States:**: Invalid State Abbreviation sent. You sent in: "+ state)
+                user.send("**States:** Invalid State Abbreviation sent. You sent in: "+ state)
             }
             delete user.state
             clearTimeout(user.timeout)
@@ -110,7 +111,7 @@ module.exports = class StateManager{
         member.roles.cache.forEach(role =>{
             if(states.includes(role.name)){
                 member.roles.remove(role)
-                user.send(`**States:**: ${role.name} has been removed.`)
+                user.send(`**States:** ${role.name} has been removed.`)
             }
         })
     }
