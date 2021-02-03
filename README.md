@@ -16,3 +16,8 @@ Bot verifies and does course stuff lmao.
 - Axios (API fetch)
 - JSDOM(HTML parse from Yale API)
 
+### Misc Dependencies
+- Lodash(Arrays)
+- uuid(Veriication)
+- Winston(Logs)
+- sqlite3(Dev)
