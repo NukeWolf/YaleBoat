@@ -10,7 +10,7 @@ Bot verifies and does course stuff lmao.
 
 ## Dependencies
 
-- Discord.JS (API Libary)
+- Discord.JS (API Library)
 - PostgreSQL (Database)
 - Sequalize (DB ORM)
 - Axios (API fetch)
