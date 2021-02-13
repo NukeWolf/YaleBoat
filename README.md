@@ -1,6 +1,6 @@
 # YaleBoat
 
-Bot verifies and does course stuff lmao.
+Bot verifies and does course stuff.
 
 ## Main Features
 * [Invite Manager](util/inviteManager.js) that tracks invite codes and who joins using those codes in a log channel 
