@@ -37,23 +37,36 @@ const createInviteEmbed = (invite) => {
 }
 
 
+
 module.exports = class inviteManager{
     constructor(client){
-        this.inviteRefs = {}
-        client.getMainGuild()
-            .then(guild =>{
-                guild.fetchInvites().then( inviteList => {
-                    this.inviteList = inviteList
-                    const channel = guild.channels.resolve(adminChannel)
-                    inviteList.map( invite => {
-                        channel.send(createInviteEmbed(invite)).then(message => this.inviteRefs[invite.code] = message)
-                    })
-                })
-            })
-            .catch(e => {
-                client.log("error",e)
-                client.log("info","InviteManager failed to load.",true)
-            })
+        (async() => {
+            this.client = client
+            //First time setup and check
+            const configCheck = await client.db.Config.findAll()
+            if(configCheck.length == 0) {
+                await client.db.Config.create({id:1,invites:{}})
+            };
+            //Load the previous invite config
+            this.inviteRefs = await this.fetchDBInviteRefs()
+        })()  
+        
+        // Old Code that didn't update the source
+        // client.getMainGuild()
+        //     .then(guild =>{
+        //         guild.fetchInvites().then( inviteList => {
+        //             this.inviteList = inviteList
+        //             const channel = guild.channels.resolve(adminChannel)
+        //             inviteList.map( invite => {
+                        
+        //                 channel.send(createInviteEmbed(invite)).then(message => this.inviteRefs[invite.code] = message)
+        //             })
+        //         })
+        //     })
+        //     .catch(e => {
+        //         client.log("error",e)
+        //         client.log("info","InviteManager failed to load.",true)
+        //     })
     }
     /**
      * Adds the member to the invite log when joined and tracks which invite link they used, by comparing a old cached list of invites with a new invite list.
@@ -87,8 +100,18 @@ module.exports = class inviteManager{
     onInviteCreate = async invite => {
         const guild = invite.guild
         const channel = guild.channels.resolve(adminChannel)
-        channel.send(createInviteEmbed(invite)).then(message => this.inviteRefs[invite.code] = message)
+        const message = await channel.send(createInviteEmbed(invite))
+        this.inviteRefs[invite.code] = message.id
         this.inviteList = await guild.fetchInvites()
     }
-
+    fetchDBInviteRefs = async () => {
+        try{
+            const config = await this.client.db.Config.findOne({ where: { id: 1 } })
+            const invites = await config.get('invites')
+            return invites
+        }
+        catch(e){
+            this.client.log('error',e,true)
+        }
+    }
 }
