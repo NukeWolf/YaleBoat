@@ -1,8 +1,8 @@
 const fs = require('fs')
 const Discord = require('discord.js');
 const {prefix, roleId, mainGuild} = require('./config')
-const inviteManager = require('./util/inviteManager')
-const stateManager = require('./util/stateManager')
+const inviteManager = require('./services/inviteManager')
+const stateManager = require('./services/stateManager')
 
 
 const client = new Discord.Client();
@@ -103,6 +103,9 @@ client.on('message', async message =>{
 
     //Checks for DM Only
     if(cmd.dmOnly && message.channel.type !== 'dm') return;
+    //Checks for Guild Only
+    if(cmd.guildOnly && message.channel.type == 'dm') return;
+    
     //Malicious Check
     const user = await client.db.Users.findOne({ where: { user_id: message.author.id } });
     if(user && user.get('malicious')) return message.reply("There was an issue verifying your ID. Please contact an Admin for further assistance.");
