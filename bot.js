@@ -1,6 +1,5 @@
 const fs = require('fs')
 const Discord = require('discord.js');
-const Sequelize = require('sequelize')
 const {prefix, roleId, mainGuild} = require('./config')
 const inviteManager = require('./util/inviteManager')
 const stateManager = require('./util/stateManager')
@@ -31,59 +30,15 @@ for (const file of commandFiles){
 }
 
 //DB Setup
+client.db = require('./util/db').init()
 
-var sequelize = null
-if (process.env.DATABASE_URL) {
-    sequelize = new Sequelize(process.env.DATABASE_URL, {
-        dialect:  'postgres',
-        protocol: 'postgres',
-        logging:  false, //false
-        dialectOptions: {
-            ssl:{
-                require: true,
-                rejectUnauthorized: false
-            }
-            
-        }
-    })
-}
-else{
-    sequelize = new Sequelize('database', 'user', 'password', {
-        host: 'localhost',
-        dialect: 'sqlite',
-        logging: false,
-        // SQLite only
-        storage: 'database.sqlite',
-    });
-}
-
-const Users = sequelize.define('users', {
-	user_id: {
-		type: Sequelize.STRING,
-		primaryKey: true,
-	},
-	uuid: {
-        type: Sequelize.STRING,
-		unique: true,
-    },
-    rawLink: Sequelize.STRING,
-    malicious: {
-        type: Sequelize.BOOLEAN,
-        defaultValue:false,
-    },
-    courses: {
-        type: Sequelize.JSON,
-    }
-});
-
-client.db = {Users , sequelize}
 
 /**
  * @param {Discord.Guild} guild
  */
 client.once('ready', async () =>{
+    client.db.sync()
     client.user.setPresence({ activity: { name: 'Try !course in DMs' }})
-    Users.sync();
     client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
     client.stateManager = new stateManager(client)
@@ -112,7 +67,7 @@ client.on('guildMemberAdd', async member => {
             .setTimestamp()
             .setFooter('*Your link may look a little different. UUIDv1');
     //Apropriate Welcome message based on verification database.
-    const user = await Users.findOne({ where: { user_id: member.id } });
+    const user = await client.db.Users.findOne({ where: { user_id: member.id } });
     if(user){
         if(user.get('malicious')){
             member.send("Welcome to the Yale 2025 Discord Server!\nIn order to verify your account, please DM one of the admins for assistance.")
@@ -149,7 +104,7 @@ client.on('message', async message =>{
     //Checks for DM Only
     if(cmd.dmOnly && message.channel.type !== 'dm') return;
     //Malicious Check
-    const user = await Users.findOne({ where: { user_id: message.author.id } });
+    const user = await client.db.Users.findOne({ where: { user_id: message.author.id } });
     if(user && user.get('malicious')) return message.reply("There was an issue verifying your ID. Please contact an Admin for further assistance.");
 
     //Permission Check

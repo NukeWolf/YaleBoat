@@ -39,34 +39,13 @@ const createInviteEmbed = (invite) => {
 
 
 module.exports = class inviteManager{
+    //Gets reference list
     constructor(client){
-        (async() => {
-            this.client = client
-            //First time setup and check
-            const configCheck = await client.db.Config.findAll()
-            if(configCheck.length == 0) {
-                await client.db.Config.create({id:1,invites:{}})
-            };
-            //Load the previous invite config
-            this.inviteRefs = await this.fetchDBInviteRefs()
-        })()  
-        
-        // Old Code that didn't update the source
-        // client.getMainGuild()
-        //     .then(guild =>{
-        //         guild.fetchInvites().then( inviteList => {
-        //             this.inviteList = inviteList
-        //             const channel = guild.channels.resolve(adminChannel)
-        //             inviteList.map( invite => {
-                        
-        //                 channel.send(createInviteEmbed(invite)).then(message => this.inviteRefs[invite.code] = message)
-        //             })
-        //         })
-        //     })
-        //     .catch(e => {
-        //         client.log("error",e)
-        //         client.log("info","InviteManager failed to load.",true)
-        //     })
+        this.client = client
+        client.getMainGuild().then((guild) =>
+            guild.fetchInvites().then((list)=>this.inviteList = list)
+        )
+        .catch((e) =>{client.log('error',e)})
     }
     /**
      * Adds the member to the invite log when joined and tracks which invite link they used, by comparing a old cached list of invites with a new invite list.
@@ -82,7 +61,8 @@ module.exports = class inviteManager{
             return false;
         })
         if(updatedInvite){
-            const message = this.inviteRefs[updatedInvite.code]
+            const message = await this.fetchMessage(updatedInvite)
+            if(!message) return this.client.log('error',`${member.toString()} joined with ${updatedInvite.code}`,true);
             const oldEmbed = message.embeds[0];
             //Update Uses
             const useField = oldEmbed.fields[0].value
@@ -91,7 +71,7 @@ module.exports = class inviteManager{
             if(oldEmbed.fields[3].value === 'None') oldEmbed.fields[3].value = '';
             oldEmbed.fields[3].value += member.toString() + " • "
             //Edit new embed
-            message.edit(oldEmbed).then(message => this.inviteRefs[updatedInvite.code] = message)
+            await message.edit(oldEmbed)
         }
         //Update inviteList
         this.inviteList = newInviteList
@@ -100,18 +80,22 @@ module.exports = class inviteManager{
     onInviteCreate = async invite => {
         const guild = invite.guild
         const channel = guild.channels.resolve(adminChannel)
-        const message = await channel.send(createInviteEmbed(invite))
-        this.inviteRefs[invite.code] = message.id
+        await channel.send(createInviteEmbed(invite))
         this.inviteList = await guild.fetchInvites()
     }
-    fetchDBInviteRefs = async () => {
-        try{
-            const config = await this.client.db.Config.findOne({ where: { id: 1 } })
-            const invites = await config.get('invites')
-            return invites
-        }
-        catch(e){
-            this.client.log('error',e,true)
-        }
-    }
+    /**
+    * @param  {import('discord.js').Client} client
+    */
+    fetchMessage = async (invite) => {
+        const guild = invite.guild
+        const channel = guild.channels.resolve(adminChannel)
+        const messages = await channel.messages.fetch({limit:100})
+        const inviteCode = invite.code
+        const message = messages.find((message) => {
+            if(message.embeds.length == 0) return false
+            const title = message.embeds[0].title
+            return title.includes(inviteCode)
+        });
+        return message
+    }   
 }
