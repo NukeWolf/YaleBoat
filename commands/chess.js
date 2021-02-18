@@ -43,13 +43,23 @@ module.exports = {
 
             message.author.chess = new ChessGame(channel,message.author.id,mentioned.id)
             mentioned.chess = message.author.chess
-            const cleanup = (result) =>{
-                challenge.reply()
+            const cleanup = () =>{
                 message.author.chess = undefined
                 mentioned.chess = undefined
-                
+                role.delete()
+                channel.delete()
             }
+            message.author.chess.setCleanup(cleanup)
 
+            //Spectating
+            const reactionCollector = challenge.createReactionCollector((reaction,user)=>{
+                return reaction.emoji.name == "🎥"
+            })
+            reactionCollector.on('collect',async (reaction,user) => { 
+                guild.member(user).roles.add(role)
+            })
+            challenge.react('🎥')
+            return channel
         }
         const action = args[0]
         switch(action){
@@ -69,8 +79,8 @@ module.exports = {
                 reactionCollector.on('collect',async (reaction,user) => { 
                     //Tests if it is a checkmark
                     if(reaction.emoji.name == emojis[1]){
-                        setupGame(challengerMember,mentioned)
-                        challenge.edit(challengeEmbed(challengerMember,opponentMember,true))
+                        const channel = await setupGame(mentioned,challenge)
+                        challenge.edit(challengeEmbed(challengerMember,opponentMember,true,channel))
                     }
                     else{
                         challenge.edit(challengeEmbed(challengerMember,opponentMember,false))
@@ -91,11 +101,12 @@ module.exports = {
 /**
  * @param  {import('discord.js').GuildMember} challenger
  * @param  {import('discord.js').GuildMember} opponent
+ * @param  {import('discord.js').TextChannel} channel
  */
-const challengeEmbed = (challenger,opponent,accepted) => {
+const challengeEmbed = (challenger,opponent,accepted,channel) => {
     if (accepted == null) description = `Does ${opponent.toString()} accept the challenge?`;
     if (accepted === false) description = `${opponent.toString()} declined the challenge.`
-    if (accepted === true) description = `${opponent.toString()} accepted the challenge. Spectate the match with the :`
+    if (accepted === true) description = `${opponent.toString()} accepted the challenge.\nCheck ${channel.toString()}\nPress :movie_camera: to spectate the match.`
     return {embed:{
         "title":`${challenger.nickname || challenger.user.username} challenges ${opponent.nickname || opponent.user.username} to a chess match!`,
         description,
@@ -106,9 +117,7 @@ const challengeEmbed = (challenger,opponent,accepted) => {
     }}
 }
 
-const endGameEmbed = (winner,pgn) =>{
-    
-}
+
 
 
 const helpEmbed = {

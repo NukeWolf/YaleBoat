@@ -13,6 +13,11 @@ class ChessGame{
         this.player1 = player1
         this.player2 = player2
         this.channel = channel
+        if(config) {
+            this.initExisting(config)
+            return this
+        }
+
         channel.send(`${channel.guild.member(player2).toString()}, Type 'black', 'white', or 'random' for side selection.`)
         const setupCollector = channel.createMessageCollector((m) => {
             const options = ['black','white','random']
@@ -31,6 +36,7 @@ class ChessGame{
             }
             this.init()
         })
+
     }
     async init(){
         this.config = await this.channel.send("Ignore this, used to track game")
@@ -47,25 +53,52 @@ class ChessGame{
         await this.channel.send({embed:helpEmbed})
         this.render()
     }
+    async initExisting(config){
+        this.config = config.config
+
+        this.game = new Chess()
+        this.game.load_pgn(config.pgn)
+        this.turn = config.turn
+        this.imgGen = new ChessImageGenerator()
+        this.collector = this.channel.createMessageCollector((m) => {
+            return m.author.id == this.player1 || m.author.id == this.player2
+        });
+        this.collector.on('collect', (message) =>{
+            this.parseCommand(message)
+        })
+    }
+
     parseCommand(message){
-        if(message.content.startsWith('help')){
+        if(message.content.startsWith('!resign')){
+            this.gameover = true
+            this.channel.send({embed:endGameEmbed(`${message.author.username} has resigned.`,this.game.pgn())})
+        }
+        if(message.content.startsWith('!end')){
+            this.cleanup()
+        }
+        if(message.content.startsWith('!movehelp')){
             message.reply({embed:helpEmbed})
         }
         const movealiases = ['!m','!move','m','move']
-        if(movealiases.some((command) => message.content.toLowerCase().startsWith(command+" "))){
+        if(movealiases.some((command) => message.content.toLowerCase().startsWith(command+" ")) && !this.gameover){
             //Check if its their turn
             if(message.author.id != this.turn) return message.reply("Not your turn.");
             //Checks if K
             const args = message.content.split(' ')
-            if(args[1][0] == "K") return message.reply("Use `N` for knight instead of K.")
-
             const result = this.game.move(args[1],{sloppy:true})
             if(!result){
+                if(args[1][0] == "K") message.reply("Use `N` for knight instead of K.")
                 return message.reply("Move Invalid.")
+            }
+            const end = this.endGameCheck()
+            if(end){
+                this.gameover = true
+                this.channel.send({embed:endGameEmbed(end,this.game.pgn())})
+                return
             }
             this.turn = (this.turn == this.player1) ? this.player2 : this.player1
             this.render()
-            const end = this.endGameCheck()
+            
         }
     }
     async render(){
@@ -82,14 +115,17 @@ class ChessGame{
     endGameCheck(){
         const game = this.game
         if (game.in_checkmate()){
-            return ""
+            const winner = this.channel.guild.member(this.turn)
+            return `${winner.nickname || winner.user.username} has won!`
         }
+        if(game.in_stalemate()) return "Draw - Stalemate"
+        if(game.in_threefold_repetition()) return "Draw - Threefold Repetition"
+        if(game.insufficient_material()) return "Draw - Insufficient Material"
+        if(game.in_draw()) return "Draw"
     }
-
-    cleanup(){
-        //Cleanup command
-    }
-    
+    setCleanup(cleanup){
+        this.cleanup = cleanup
+    }  
 }
 
 const commands = [
@@ -121,7 +157,7 @@ const capturing = [
 
 const helpEmbed = {
     title:"**Chess Commands**",
-    description:'Type help to resend this message.',
+    description:'Type !movehelp to resend this message.',
     'color':0x0a47b8,
     fields:[
         {
@@ -142,20 +178,24 @@ const helpEmbed = {
     }
 }
 
-const endGameEmbed = (winner,pgn) =>{
-    const title = (!winner) ? "Stalemate or draw" : "Winner"
-    const description = "PGN for analysis: " + pgn
-
+const endGameEmbed = (result,pgn) =>{
     return {
-        title:"**Chess Commands**",
-        description:"Challenge someone to play chess",
+        title:result,
+        description:pgn,
         'color':0x0a47b8,
         fields:[
             {
-                name: '__**!chess challenge**__',
-                value: 'Usage: `!chess challenge <mention>`\nThis command allows you to challenge someone to game of chess'
+                name:'Delete Channel',
+                value:'Once done discussing and analying, delete channel by typing `!end`.'
             },
-            
+            {
+                name: 'Lichess Analysis',
+                value: 'Copy the PGN above into [https://lichess.org/analysis](https://lichess.org/analysis) for analysis.'
+            },
+            {
+                name:"Chess.com Analysis",
+                value:'If you have an account on Chess.com, copy the pgn into [https://www.chess.com/analysis](https://www.chess.com/analysis)'
+            },    
         ],
         footer:{
             text:`This Feature uses chess.js and chessboard.js`,

@@ -8,6 +8,7 @@ const stateManager = require('./services/stateManager')
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.log = require('./util/log')
+const initChess = require('./util/initChess')
 
 /**
  * Gets the main Yale 2025 Guild
@@ -37,11 +38,13 @@ client.db = require('./util/db').init()
  * @param {Discord.Guild} guild
  */
 client.once('ready', async () =>{
+    
     client.db.sync()
     client.user.setPresence({ activity: { name: 'Try !course in DMs' }})
     client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
     client.stateManager = new stateManager(client)
+    initChess(client)
 })
 
 client.on('inviteCreate', invite => {
