@@ -2,6 +2,7 @@ const { Chess } = require('chess.js')
 const ChessImageGenerator = require('chess-image-generator')
 const {MessageAttachment} = require('discord.js')
 const Jimp = require('jimp')
+const {commandsChannel} = require('../config')
 
 class ChessGame{
     /**
@@ -70,8 +71,8 @@ class ChessGame{
 
     parseCommand(message){
         if(message.content.startsWith('!resign')){
-            this.gameover = true
-            this.channel.send({embed:endGameEmbed(`${message.author.username} has resigned.`,this.game.pgn())})
+            this.endGame(`${message.author.username} has resigned.`)
+            return
         }
         if(message.content.startsWith('!end')){
             this.cleanup()
@@ -103,14 +104,20 @@ class ChessGame{
             }
             const end = this.endGameCheck()
             if(end){
-                this.gameover = true
-                this.channel.send({embed:endGameEmbed(end,this.game.pgn())})
+                this.endGame(end)
                 return
             }
             this.turn = (this.turn == this.player1) ? this.player2 : this.player1
             this.render()
             
         }
+    }
+    endGame(msg){
+        this.gameover = true
+        const embed = {embed:endGameEmbed(msg,this.game.pgn(),this.channel.name)}
+        this.channel.send(embed)
+        const channel = this.channel.guild.channels.resolve(comandsChannel)
+        channel.send(embed)
     }
     async render(){
         //console.log(this.game.ascii())
@@ -193,9 +200,9 @@ const helpEmbed = {
     }
 }
 
-const endGameEmbed = (result,pgn) =>{
+const endGameEmbed = (result,pgn,match) =>{
     return {
-        title:result,
+        title:result+" | "+match,
         description:pgn,
         'color':0x0a47b8,
         fields:[

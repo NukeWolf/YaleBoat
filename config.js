@@ -6,5 +6,6 @@ module.exports = {
     "roleChannel" : process.env.roleChannel || "764531633566908506",
     'stateMsg1': process.env.stateMsg1 || "799707376819240971",
     'stateMsg2' : process.env.stateMsg2 || "799707377423089704",
-    'chessCategory' : process.env.chessCategory || "811727778789326898"
+    'chessCategory' : process.env.chessCategory || "811727778789326898",
+    'commandsChannel' : process.env.commandsChannel || "764531633566908506"
 }
