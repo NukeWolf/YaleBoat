@@ -79,6 +79,17 @@ class ChessGame{
         if(message.content.startsWith('!movehelp')){
             message.reply({embed:helpEmbed})
         }
+        if(message.content.startsWith('!undo')){
+            if(message.author.id == this.turn){
+                const result = this.game.undo()
+                if(!result) return;
+                this.turn = (this.turn == this.player1) ? this.player2 : this.player1
+                this.render()
+            }
+            else{
+                return message.reply("Your Opponent must Undo your move! Opponent needs to type !undo")
+            }
+        }
         const movealiases = ['!m','!move','m','move']
         if(movealiases.some((command) => message.content.toLowerCase().startsWith(command+" ")) && !this.gameover){
             //Check if its their turn
@@ -171,7 +182,11 @@ const helpEmbed = {
         {
             name:'__**Castling**__',
             value:"Castle Kingside with `m O-O`. Castle Queenside with `m O-O-O`. O's are capitalized."
-        }
+        },
+        {
+            name:'__**Additional Commands**__',
+            value:"`!resign` - Ends the game and allows you to see analysis.\n`!undo` - Undos your **opponent's last move**. Can only be called on your turn. "
+        },
     ],
     footer:{
         text:`This Feature uses chess.js and chessboard.js`,
