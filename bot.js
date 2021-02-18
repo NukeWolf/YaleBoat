@@ -38,9 +38,8 @@ client.db = require('./util/db').init()
  * @param {Discord.Guild} guild
  */
 client.once('ready', async () =>{
-    
     client.db.sync()
-    client.user.setPresence({ activity: { name: 'Try !course in DMs' }})
+    client.user.setPresence({ activity: { name: 'Try !chess; !course' }})
     client.log("info","Bot is now Online!",true)
     client.inviteManager = new inviteManager(client)
     client.stateManager = new stateManager(client)

@@ -1,5 +1,6 @@
 const ChessGame = require('../services/ChessGame') 
 const { chessCategory } = require('../config')
+const challengeExpiration = 30
 
 const emojis = ['❌','✅']
 
@@ -74,7 +75,7 @@ module.exports = {
                 //Create the reaction collector for the user to accept the challenge
                 const reactionCollector = challenge.createReactionCollector((reaction,user)=>{
                     return emojis.includes(reaction.emoji.name) && user.id == mentioned.id;
-                },{max:1,time:300*1000})
+                },{max:1,time:30*60*1000})
                 //Where the channel gets created if needed
                 reactionCollector.on('collect',async (reaction,user) => { 
                     //Tests if it is a checkmark
@@ -111,7 +112,7 @@ const challengeEmbed = (challenger,opponent,accepted,channel) => {
         "title":`${challenger.nickname || challenger.user.username} challenges ${opponent.nickname || opponent.user.username} to a chess match!`,
         description,
         footer: {
-            text:(accepted == null) ? "This challenge expires in 5 minutes" : "" ,
+            text:(accepted == null) ? "This challenge expires in 30 minutes" : "" ,
         },
         'color':0x0a47b8,
     }}

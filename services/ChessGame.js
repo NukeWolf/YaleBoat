@@ -92,7 +92,7 @@ class ChessGame{
             }
         }
         const movealiases = ['!m','!move','m','move']
-        if(movealiases.some((command) => message.content.toLowerCase().startsWith(command+" ")) && !this.gameover){
+        if(movealiases.some((command) => message.content.toLowerCase().startsWith(command+" ")) && !this.game.game_over()){
             //Check if its their turn
             if(message.author.id != this.turn) return message.reply("Not your turn.");
             //Checks if K
@@ -112,12 +112,19 @@ class ChessGame{
             
         }
     }
-    endGame(msg){
-        this.gameover = true
-        const embed = {embed:endGameEmbed(msg,this.game.pgn(),this.channel.name)}
-        this.channel.send(embed)
+    async endGame(msg){
+        this.imgGen.loadFEN(this.game.fen())
+        const buffer = await this.imgGen.generateBuffer()
+        const image = await Jimp.read(buffer)
+        image.composite(await Jimp.read('./src/template.png'),0,0)
+        const attatchment = new MessageAttachment(await image.getBufferAsync(Jimp.MIME_PNG),'game.png')
+
+        const embed = endGameEmbed(msg,this.game.pgn(),this.channel.name)
+        this.channel.send({files:[attatchment],embed})
         const channel = this.channel.guild.channels.resolve(commandsChannel)
-        channel.send(embed)
+        channel.send({files:[attatchment],embed})
+
+        this.turn = (this.turn == this.player1) ? this.player2 : this.player1
     }
     async render(){
         //console.log(this.game.ascii())
@@ -180,7 +187,7 @@ const helpEmbed = {
     fields:[
         {
             name: '__**Moving**__',
-            value: moveField.join('\n') + SAN.join('\n')
+            value: moveField.join('\n') +"\n" + SAN.join('\n')
         },
         {
             name:'__**Capturing**__',
@@ -212,13 +219,16 @@ const endGameEmbed = (result,pgn,match) =>{
             },
             {
                 name: 'Lichess Analysis',
-                value: 'Copy the PGN above into [https://lichess.org/analysis](https://lichess.org/analysis) for analysis.'
+                value: 'Copy the PGN above in the description into [https://lichess.org/analysis](https://lichess.org/analysis) for analysis.'
             },
             {
                 name:"Chess.com Analysis",
                 value:'If you have an account on Chess.com, copy the pgn into [https://www.chess.com/analysis](https://www.chess.com/analysis)'
             },    
         ],
+        image: {
+            url:'attachment://game.png'
+        },
         footer:{
             text:`This Feature uses chess.js and chessboard.js`,
         }
