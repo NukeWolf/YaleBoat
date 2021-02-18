@@ -1,5 +1,5 @@
 const ChessGame = require('../services/ChessGame') 
-//const { chessCategory } = require('../config')
+const { chessCategory } = require('../config')
 
 const emojis = ['❌','✅']
 
@@ -14,32 +14,66 @@ module.exports = {
      * @param  {Array<String>} args
      */
     async execute(message,args) {
+        const guild = message.guild
+        const time = Math.floor(Date.now() / 1000)
+        const setupGame = async (mentioned,challenge) =>{
+            const challengerMember = guild.member(message.author)
+            const opponentMember = guild.member(mentioned)
+            const role = await guild.roles.create({data:{name:`chess${time}`}})
+
+            challengerMember.roles.add(role)
+            opponentMember.roles.add(role)
+
+            const name = `${challengerMember.nickname || challengerMember.user.username} vs ${opponentMember.nickname || opponentMember.user.username} ${time}`
+            const channel = await guild.channels.create(name,
+                {
+                    parent:chessCategory,
+                    permissionOverwrites:[
+                        {
+                            id:role.id,
+                            allow:['VIEW_CHANNEL']
+                        },
+                        {
+                            id:guild.roles.everyone.id,
+                            deny:['VIEW_CHANNEL']
+                        }
+                    ]
+                }
+            )
+
+            message.author.chess = new ChessGame(channel,message.author.id,mentioned.id)
+            mentioned.chess = message.author.chess
+            const cleanup = (result) =>{
+                challenge.reply()
+                message.author.chess = undefined
+                mentioned.chess = undefined
+                
+            }
+
+        }
         const action = args[0]
         switch(action){
             case "challenge":
                 const mentioned = message.mentions.users.first()
                 if(!mentioned) return message.reply("You must mention someone to challenge.");
                 //Create the challenge Embed
-                const challenge = await message.channel.send(challengeEmbed(message.guild.member(message.author),message.guild.member(mentioned)))
+                const challengerMember = guild.member(message.author)
+                const opponentMember = guild.member(mentioned)
+                const challenge = await message.channel.send(challengeEmbed(challengerMember,opponentMember))
 
                 //Create the reaction collector for the user to accept the challenge
                 const reactionCollector = challenge.createReactionCollector((reaction,user)=>{
                     return emojis.includes(reaction.emoji.name) && user.id == mentioned.id;
-                },{max:1})
+                },{max:1,time:300*1000})
                 //Where the channel gets created if needed
                 reactionCollector.on('collect',async (reaction,user) => { 
                     //Tests if it is a checkmark
                     if(reaction.emoji.name == emojis[1]){
-
-                        const channel = await message.guild.channels.create()
-
-                        message.author.chess = new ChessGame(channel,message.author.id,mentioned.id)
-                        mentioned.chess = message.author.chess
-
-                        challenge.edit(challengeEmbed(message.guild.member(message.author),message.guild.member(mentioned),true))
+                        setupGame(challengerMember,mentioned)
+                        challenge.edit(challengeEmbed(challengerMember,opponentMember,true))
                     }
                     else{
-                        challenge.edit(challengeEmbed(message.guild.member(message.author),message.guild.member(mentioned),false))
+                        challenge.edit(challengeEmbed(challengerMember,opponentMember,false))
                     }
                 })
                 //Adding Reactions
@@ -72,6 +106,9 @@ const challengeEmbed = (challenger,opponent,accepted) => {
     }}
 }
 
+const endGameEmbed = (winner,pgn) =>{
+    
+}
 
 
 const helpEmbed = {
