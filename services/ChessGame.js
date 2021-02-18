@@ -116,7 +116,7 @@ class ChessGame{
         this.gameover = true
         const embed = {embed:endGameEmbed(msg,this.game.pgn(),this.channel.name)}
         this.channel.send(embed)
-        const channel = this.channel.guild.channels.resolve(comandsChannel)
+        const channel = this.channel.guild.channels.resolve(commandsChannel)
         channel.send(embed)
     }
     async render(){
