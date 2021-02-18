@@ -16,16 +16,16 @@ module.exports = {
      */
     async execute(message,args) {
         const guild = message.guild
-        const time = Math.floor(Date.now() / 1000)
+        const unix = Math.floor(Date.now() / 1000)
         const setupGame = async (mentioned,challenge) =>{
             const challengerMember = guild.member(message.author)
             const opponentMember = guild.member(mentioned)
-            const role = await guild.roles.create({data:{name:`chess${time}`}})
+            const role = await guild.roles.create({data:{name:`chess${unix}`}})
 
             challengerMember.roles.add(role)
             opponentMember.roles.add(role)
 
-            const name = `${challengerMember.nickname || challengerMember.user.username} vs ${opponentMember.nickname || opponentMember.user.username} ${time}`
+            const name = `${challengerMember.nickname || challengerMember.user.username} vs ${opponentMember.nickname || opponentMember.user.username} ${unix}`
             const channel = await guild.channels.create(name,
                 {
                     parent:chessCategory,
