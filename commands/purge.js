@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'purge',
-    aliases:['clear','prune'],
+    name: 'ypurge',
+    aliases:[],
     description: 'Mass deletes a number of most recent messages. Can also select a person to only delete.',
     permissions: ['MANAGE_MESSAGES'], 
     /**

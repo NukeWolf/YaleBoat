@@ -53,13 +53,13 @@ module.exports = {
             message.author.chess.setCleanup(cleanup)
 
             //Spectating
+            await challenge.react('🎥')
             const reactionCollector = challenge.createReactionCollector((reaction,user)=>{
                 return reaction.emoji.name == "🎥"
             })
             reactionCollector.on('collect',async (reaction,user) => { 
                 guild.member(user).roles.add(role)
             })
-            challenge.react('🎥')
             return channel
         }
         const action = args[0]
@@ -107,7 +107,7 @@ module.exports = {
 const challengeEmbed = (challenger,opponent,accepted,channel) => {
     if (accepted == null) description = `Does ${opponent.toString()} accept the challenge?`;
     if (accepted === false) description = `${opponent.toString()} declined the challenge.`
-    if (accepted === true) description = `${opponent.toString()} accepted the challenge.\nCheck ${channel.toString()}\nPress :movie_camera: to spectate the match.`
+    if (accepted === true) description = `${opponent.toString()} accepted the challenge.\nCheck channel ${channel.toString()}\nPress :movie_camera: to get permissions to channel and spectate the match.`
     return {embed:{
         "title":`${challenger.nickname || challenger.user.username} challenges ${opponent.nickname || opponent.user.username} to a chess match!`,
         description,
