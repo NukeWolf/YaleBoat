@@ -24,6 +24,7 @@ class ChessGame{
             const options = ['black','white','random']
             return m.author.id == player2 && options.includes(m.content.toLowerCase())
         },{max:1});
+        
         setupCollector.on('collect', (message) =>{
             switch(message.content.toLowerCase()){
                 case "white":
