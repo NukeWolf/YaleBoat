@@ -100,6 +100,7 @@ client.on("guildMemberAdd", async (member) => {
         .setDescription(
             "**__Welcome to the Yale Class of 2025!__**\nThis is Yaleboat, a bot for handling verification and other random cool commands.\nPlease make sure to read rules and set your roles in #roles."
         )
+        .addField("Random Commands", "!course, !chess, !randomcollege")
         .addField(
             "Contact and Help",
             "If you need help with the server, DM any of the admins on the server for help."
