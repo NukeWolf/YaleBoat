@@ -19,7 +19,7 @@ module.exports = class bulldogDaysManager {
             };
         });
         this.setupDaily(events);
-        events[1].startDate = "2021-04-07T01:35:00-04:00";
+        events[1].startDate = "2021-04-07T01:45:00-04:00";
         events.forEach((event) => {
             const date = new Date(event.startDate);
             const oneHourBefore = new Date(event.startDate);
@@ -51,7 +51,7 @@ module.exports = class bulldogDaysManager {
     async setupDaily(events) {
         const dailyRule = new schedule.RecurrenceRule();
         dailyRule.hour = 1;
-        dailyRule.minute = 35;
+        dailyRule.minute = 45;
         dailyRule.tz = "America/New_York";
         const job = schedule.scheduleJob(dailyRule, () => {
             this.dailyMessage(events);
@@ -59,10 +59,27 @@ module.exports = class bulldogDaysManager {
     }
 
     async dailyMessage(events) {
+        const guild = await this.client.getMainGuild();
+        const channel = await guild.channels.resolve(bddAnouncements);
         const currentDate = new Date().getDate();
-        const filtered = events.filter((event) => {
-            return currentDate === new Date(event.startDate).getDate();
-        });
+
+        const scheduleImg = new Discord.MessageAttachment(
+            "./src/bddschedule.jpg"
+        );
+        // const filtered = events.filter((event) => {
+        //     return currentDate === new Date(event.startDate).getDate();
+        // });
+        const filtered = [];
+        const none = {
+            title: `**No events for April ${new Date().getDate()}**`,
+            description:
+                "Welcome to Bulldog Days of April!\nAll Events here: https://crosscampus.yale.edu/hub/asn/events-v2",
+            image: { url: "attachment://bddschedule.jpg" },
+            color: 0x0a47b8,
+        };
+
+        if (filtered.length == 0)
+            return channel.send({ files: [scheduleImg], embed: none });
         const embeds = filtered.map((event) => {
             const description = event.description
                 .replace(/<br>/g, "")
@@ -105,9 +122,7 @@ module.exports = class bulldogDaysManager {
                 },
             };
         });
-        const scheduleImg = new Discord.MessageAttachment(
-            "./src/bddschedule.jpg"
-        );
+
         const embed = {
             title: `**UPCOMING EVENTS for April ${new Date().getDate()}**`,
             description:
@@ -121,8 +136,7 @@ module.exports = class bulldogDaysManager {
                 "If you want to opt into being reminded when these events start, react to :white_check_mark:.\nIf you want to opt out of reminders, react to :x:",
             color: 0x0a47b8,
         };
-        const guild = await this.client.getMainGuild();
-        const channel = await guild.channels.resolve(bddAnouncements);
+
         await channel.send(
             "~~---------------------------------------------------------------------------------------------------------~~\n\n\n~~---------------------------------------------------------------------------------------------------------~~"
         );
