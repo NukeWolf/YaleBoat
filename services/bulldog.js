@@ -19,7 +19,7 @@ module.exports = class bulldogDaysManager {
             };
         });
         this.setupDaily(events);
-        events[1].startDate = "2021-04-07T01:45:00-04:00";
+        events[1].startDate = "2021-04-07T01:48:00-04:00";
         events.forEach((event) => {
             const date = new Date(event.startDate);
             const oneHourBefore = new Date(event.startDate);
@@ -51,7 +51,7 @@ module.exports = class bulldogDaysManager {
     async setupDaily(events) {
         const dailyRule = new schedule.RecurrenceRule();
         dailyRule.hour = 1;
-        dailyRule.minute = 45;
+        dailyRule.minute = 48;
         dailyRule.tz = "America/New_York";
         const job = schedule.scheduleJob(dailyRule, () => {
             this.dailyMessage(events);
@@ -66,10 +66,10 @@ module.exports = class bulldogDaysManager {
         const scheduleImg = new Discord.MessageAttachment(
             "./src/bddschedule.jpg"
         );
-        // const filtered = events.filter((event) => {
-        //     return currentDate === new Date(event.startDate).getDate();
-        // });
-        const filtered = [];
+        const filtered = events.filter((event) => {
+            return currentDate === new Date(event.startDate).getDate();
+        });
+
         const none = {
             title: `**No events for April ${new Date().getDate()}**`,
             description:
