@@ -8,7 +8,7 @@ module.exports = {
      */
     execute(message, args) {
         return message.channel.send(
-            "Some sick food to eat: https://docs.google.com/document/d/1ngXnPsRWBjj5NEvdjCe_ayEF44kDemjmmS3HaYn8Dhg/edit"
+            "https://docs.google.com/document/d/1ngXnPsRWBjj5NEvdjCe_ayEF44kDemjmmS3HaYn8Dhg/edit"
         );
     },
 };

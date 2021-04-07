@@ -3,6 +3,7 @@ const Discord = require("discord.js");
 const { prefix, roleId, mainGuild } = require("./config");
 const inviteManager = require("./services/inviteManager");
 const stateManager = require("./services/stateManager");
+const bulldogDaysManager = require("./services/bulldog");
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -38,7 +39,6 @@ const commandFolders = fs
             client.commands.set(command.name, command);
         });
     });
-console.log(client.commands);
 //DB Setup
 client.db = require("./util/db").init();
 
@@ -51,6 +51,8 @@ client.once("ready", async () => {
     client.log("info", "Bot is now Online!");
     client.inviteManager = new inviteManager(client);
     client.stateManager = new stateManager(client);
+    client.bulldog = new bulldogDaysManager(client);
+
     initChess(client);
 });
 
