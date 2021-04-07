@@ -19,6 +19,7 @@ module.exports = class bulldogDaysManager {
             };
         });
         this.setupDaily(events);
+        events[1].startDate = "2021-04-07T01:35:00-04:00";
         events.forEach((event) => {
             const date = new Date(event.startDate);
             const oneHourBefore = new Date(event.startDate);
@@ -49,7 +50,8 @@ module.exports = class bulldogDaysManager {
     }
     async setupDaily(events) {
         const dailyRule = new schedule.RecurrenceRule();
-        dailyRule.hour = 8;
+        dailyRule.hour = 1;
+        dailyRule.minute = 35;
         dailyRule.tz = "America/New_York";
         const job = schedule.scheduleJob(dailyRule, () => {
             this.dailyMessage(events);
