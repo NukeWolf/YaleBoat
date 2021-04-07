@@ -167,11 +167,12 @@ module.exports = class bulldogDaysManager {
             (role) => role.name === "bddRemind"
         );
         reactionCollector.on("collect", async (reaction, user) => {
-            if (reaction.emoji.name == "✅")
-                return guild.member(user).roles.add(role);
-            try {
-                guild.member(user).roles.remove(role);
-            } catch (e) {}
+            if (reaction.emoji.name == "✅") guild.member(user).roles.add(role);
+            else {
+                try {
+                    guild.member(user).roles.remove(role);
+                } catch (e) {}
+            }
             if (!user.bot) reaction.users.remove(user);
         });
     }
