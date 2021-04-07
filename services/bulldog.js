@@ -19,6 +19,7 @@ module.exports = class bulldogDaysManager {
             };
         });
         this.setupDaily(events);
+        this.events = events;
         events.forEach((event) => {
             const date = new Date(event.startDate);
             const oneHourBefore = new Date(event.startDate);
@@ -50,6 +51,7 @@ module.exports = class bulldogDaysManager {
     async setupDaily(events) {
         const dailyRule = new schedule.RecurrenceRule();
         dailyRule.hour = 9;
+        dailyRule.minute = 0;
         dailyRule.tz = "America/New_York";
         const job = schedule.scheduleJob(dailyRule, () => {
             this.dailyMessage(events);
@@ -57,6 +59,7 @@ module.exports = class bulldogDaysManager {
     }
 
     async dailyMessage(events) {
+        if (!events) events = this.events;
         const guild = await this.client.getMainGuild();
         const channel = await guild.channels.resolve(bddAnouncements);
         const currentDate = new Date().getDate();
