@@ -149,7 +149,7 @@ client.on("guildMemberAdd", async (member) => {
 
 client.on("message", async (message) => {
     if (message.content.toLowerCase().includes("harvard"))
-        return message.react("😠");
+        return message.react("😞");
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
