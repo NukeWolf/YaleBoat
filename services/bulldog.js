@@ -1,7 +1,12 @@
 const schedule = require("node-schedule");
-const eventData = require("../src/eventData/event1.json").events;
 const Discord = require("discord.js");
 const { bddAnouncements, bddReminders } = require("../config");
+
+const eventData = [];
+for (let x = 1; x <= 9; x++) {
+    const eventFile = require(`../src/eventData/event${x}.json`).events;
+    eventData.push(...eventFile);
+}
 
 module.exports = class bulldogDaysManager {
     /**
@@ -26,7 +31,7 @@ module.exports = class bulldogDaysManager {
             oneHourBefore.setHours(oneHourBefore.getHours() - 1);
             const job = schedule.scheduleJob(date, () => {
                 this.remindChannel.send(
-                    `@everyone\n**__${
+                    `@here\n**__${
                         event.headline
                     }__** is starting right now!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
                         event.id
@@ -35,7 +40,7 @@ module.exports = class bulldogDaysManager {
             });
             const job2 = schedule.scheduleJob(oneHourBefore, () => {
                 this.remindChannel.send(
-                    `@everyone\n**__${
+                    `@here\n**__${
                         event.headline
                     }__** starts in **one hour**!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
                         event.id
@@ -63,13 +68,53 @@ module.exports = class bulldogDaysManager {
         const guild = await this.client.getMainGuild();
         const channel = await guild.channels.resolve(bddAnouncements);
         const currentDate = new Date().getDate();
-
         const scheduleImg = new Discord.MessageAttachment(
             "./src/bddschedule.jpg"
         );
+        const studentEmbed = {
+            title: `**Student Events**`,
+            description:
+                "This is the huge list of student organizations that will be on display today.",
+            image: {
+                url:
+                    "https://d1ctk4ronrg3qz.cloudfront.net/event-photos%2FwgZpA491SnOIKMGLdZ9L_StudentGroupEvents_image.png",
+            },
+            fields: [],
+            color: 0x0a47b8,
+            timestamp: new Date(),
+            footer: {
+                text: `Posted at`,
+            },
+        };
+        const studentEmbeds = [];
+        const checkFull = () => {
+            if (studentEmbed.fields.length === 25) {
+                studentEmbeds.push({ ...studentEmbed });
+                studentEmbed.fields = [];
+            }
+        };
         const filtered = events.filter((event) => {
-            return currentDate === new Date(event.startDate).getDate();
+            if (currentDate !== new Date(event.startDate).getDate())
+                return false;
+            if (event.eventType === "Student Groups") {
+                checkFull();
+                const description = event.description
+                    .replace(/<br>/g, "")
+                    .replace(/&nbsp;/g, "")
+                    .replace(/[\u2018\u2019]/g, "'")
+                    .replace(/[\u201C]/g, '"');
+                studentEmbed.fields.push({
+                    name: `${event.headline} | Starts ${new Date(
+                        event.startDate
+                    ).toLocaleTimeString()}`,
+                    value: `[More info here](https://crosscampus.yale.edu/hub/asn/events-v2/${event.id})\n[Zoom Link](${event.locationText})`,
+                });
+                return false;
+            }
+            return true;
         });
+        if (studentEmbed.fields.length > 0)
+            studentEmbeds.push({ ...studentEmbed });
 
         const none = {
             title: `**No events for April ${new Date().getDate()}**`,
@@ -143,6 +188,9 @@ module.exports = class bulldogDaysManager {
         );
         await channel.send({ files: [scheduleImg], embed });
         try {
+            for (const eventEmbed of studentEmbeds) {
+                await channel.send({ embed: eventEmbed });
+            }
             for (const eventEmbed of embeds) {
                 await channel.send({ embed: eventEmbed });
             }
