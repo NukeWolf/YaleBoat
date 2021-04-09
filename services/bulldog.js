@@ -15,7 +15,6 @@ module.exports = class bulldogDaysManager {
      */
     constructor(client) {
         this.client = client;
-        this.init();
         const events = eventData.map((event) => {
             return {
                 ...event.eventData,
@@ -23,35 +22,14 @@ module.exports = class bulldogDaysManager {
                 eventType: event.eventType.name,
             };
         });
-        this.setupDaily(events);
         this.events = events;
-        events.forEach((event) => {
-            const date = new Date(event.startDate);
-            const oneHourBefore = new Date(event.startDate);
-            oneHourBefore.setHours(oneHourBefore.getHours() - 1);
-            const job = schedule.scheduleJob(date, () => {
-                this.remindChannel.send(
-                    `@here\n**__${
-                        event.headline
-                    }__** is starting right now!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
-                        event.id
-                    } or ${this.announceChannel.toString()} for more info.`
-                );
-            });
-            const job2 = schedule.scheduleJob(oneHourBefore, () => {
-                this.remindChannel.send(
-                    `@here\n**__${
-                        event.headline
-                    }__** starts in **one hour**!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
-                        event.id
-                    } or ${this.announceChannel.toString()} for more info.`
-                );
-            });
-        });
+        this.init();
+        this.setupDaily(events);
     }
     async init() {
         await this.fetchMessage();
         this.setupReactions();
+        this.setupEvents();
     }
     async setupDaily(events) {
         const dailyRule = new schedule.RecurrenceRule();
@@ -62,7 +40,36 @@ module.exports = class bulldogDaysManager {
             this.dailyMessage(events);
         });
     }
-
+    async setupEvents() {
+        const guild = await this.client.getMainGuild();
+        const role = guild.roles.cache.find(
+            (role) => role.name === "bddRemind"
+        );
+        this.events[4].startDate = "2021-04-09T01:05:15+0000";
+        this.events.forEach((event) => {
+            const date = new Date(event.startDate);
+            const oneHourBefore = new Date(event.startDate);
+            oneHourBefore.setHours(oneHourBefore.getHours() - 1);
+            const job = schedule.scheduleJob(date, () => {
+                this.remindChannel.send(
+                    `${role.toString()}\n**__${
+                        event.headline
+                    }__** is starting right now!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
+                        event.id
+                    } or ${this.announceChannel.toString()} for more info.`
+                );
+            });
+            const job2 = schedule.scheduleJob(oneHourBefore, () => {
+                this.remindChannel.send(
+                    `${role.toString()}\n**__${
+                        event.headline
+                    }__** starts in **one hour**!\nGo to https://crosscampus.yale.edu/hub/asn/events-v2/${
+                        event.id
+                    } or ${this.announceChannel.toString()} for more info.`
+                );
+            });
+        });
+    }
     async dailyMessage(events) {
         if (!events) events = this.events;
         const guild = await this.client.getMainGuild();
