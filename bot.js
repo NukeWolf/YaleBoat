@@ -146,7 +146,7 @@ client.on("guildMemberAdd", async (member) => {
         });
     }
 });
-const angadText = ["🇦", "🇳", "🇬", "🅰️", "🇩"];
+const angadText = ["🇦", "🇳", "🇬", "🅰️", "🇩", "⤴️"];
 
 const reactAngad = async (message) => {
     for (let i = 0; i < angadText.length; i++) {
