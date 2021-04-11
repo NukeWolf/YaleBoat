@@ -146,12 +146,20 @@ client.on("guildMemberAdd", async (member) => {
         });
     }
 });
+const angadText = ["🇦", "🇳", "🇬", "🅰️", "🇩"];
+
+const reactAngad = async (message) => {
+    for (let i = 0; i < angadText.length; i++) {
+        await message.react(angadText[i]);
+    }
+};
 
 client.on("message", async (message) => {
     if (message.content.toLowerCase().includes("harvard"))
         return message.react("😞");
     if (message.content.toLowerCase().includes("yale"))
         return message.react("797522900965392395");
+    if (message.member.id == "829763288082415617") return reactAngad(message);
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
