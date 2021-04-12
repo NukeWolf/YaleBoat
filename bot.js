@@ -156,9 +156,8 @@ const reactAngad = async (message) => {
 
 client.on("message", async (message) => {
     if (message.content.toLowerCase().includes("yale"))
-        return message.react("797522900965392395");
-    if (message.content.toLowerCase().includes("harvard"))
-        return message.react("😞");
+        message.react("797522900965392395");
+    if (message.content.toLowerCase().includes("harvard")) message.react("😞");
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
