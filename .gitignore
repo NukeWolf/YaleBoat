@@ -4,3 +4,4 @@ log
 secret.json
 todo
 manual
+.env

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const fs = require("fs");
 const Discord = require("discord.js");
 const { prefix, roleId, mainGuild } = require("./config");
@@ -200,4 +201,4 @@ client.on("message", async (message) => {
     }
 });
 
-client.login(process.env.BOT_TOKEN || require("./secret.json").token);
+client.login(process.env.BOT_TOKEN);
