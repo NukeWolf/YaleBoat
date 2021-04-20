@@ -148,10 +148,11 @@ client.on("guildMemberAdd", async (member) => {
     }
 });
 const angadText = ["🇦", "🇳", "🇬", "🅰️", "🇩", "⤴️"];
+const kelechiText = ["🇰", "🇱", "🇪", "🇨", "🇭", "🇮", "⤴️"];
 
-const reactAngad = async (message) => {
-    for (let i = 0; i < angadText.length; i++) {
-        await message.react(angadText[i]);
+const reactAngad = async (message, reactArr) => {
+    for (let i = 0; i < reactArr.length; i++) {
+        await message.react(reactArr[i]);
     }
 };
 
@@ -159,6 +160,11 @@ client.on("message", async (message) => {
     if (message.content.toLowerCase().includes("yale"))
         message.react("797522900965392395");
     if (message.content.toLowerCase().includes("harvard")) message.react("😞");
+    if (message.member.id == "829763288082415617")
+        reactAngad(message, angadText);
+    if (message.member.id == "754425089931608115")
+        reactAngad(message, kelechiText);
+
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
