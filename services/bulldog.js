@@ -141,7 +141,10 @@ module.exports = class bulldogDaysManager {
                 .replace(/[\u201C]/g, '"');
             return {
                 title: `**${event.headline}**`,
-                description: description,
+                description:
+                    description.length > 2047
+                        ? description.substr(0, 2047)
+                        : description,
                 image: { url: event.coverPhoto },
                 fields: [
                     {
@@ -203,6 +206,7 @@ module.exports = class bulldogDaysManager {
             }
         } catch (e) {
             this.client.log("error", "Issue with posting an event", true);
+            console.log(e);
         }
         this.reactMessage = await channel.send({ embed: optionEmbed });
         this.setupReactions();
