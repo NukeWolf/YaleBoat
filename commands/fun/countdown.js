@@ -6,18 +6,17 @@ module.exports = {
      * @param  {import 'discord.js'.Message} message
      * @param  {} args
      */
-    execute(message, args) {
-		today=new Date();
-		var cmas=new Date(today.getFullYear(), 08, 27);
-		if (today.getMonth()==08 && today.getDate()>27) 
-		{
-			cmas.setFullYear(cmas.getFullYear()+1); 
-		}  
-		var one_day=1000*60*60*24;
-		var whatsLeft = (Math.ceil((cmas.getTime()-today.getTime())/(one_day))+" days left until Move In!");
+    async execute(message, args) {
+        const today = new Date();
+        const cmas = new Date(today.getFullYear(), 07, 27);
+        if (today.getMonth() === 08 && today.getDate() > 27) {
+            cmas.setFullYear(cmas.getFullYear() + 1);
+        }
+        const one_day = 1000 * 60 * 60 * 24;
+        const whatsLeft =
+            Math.ceil((cmas.getTime() - today.getTime()) / one_day) +
+            " days left until Move In!";
 
-        return message.channel.send(
-            whatsLeft
-        );
+        return message.channel.send(whatsLeft);
     },
 };
