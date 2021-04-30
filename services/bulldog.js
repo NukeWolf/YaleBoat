@@ -3,7 +3,7 @@ const Discord = require("discord.js");
 const { bddAnouncements, bddReminders } = require("../config");
 
 const eventData = [];
-for (let x = 1; x <= 11; x++) {
+for (let x = 1; x <= 7; x++) {
     const eventFile = require(`../src/eventData/event${x}.json`).events;
     eventData.push(...eventFile);
 }
