@@ -52,7 +52,7 @@ client.once("ready", async () => {
     client.log("info", "Bot is now Online!");
     client.inviteManager = new inviteManager(client);
     client.stateManager = new stateManager(client);
-    client.bulldog = new bulldogDaysManager(client);
+    // client.bulldog = new bulldogDaysManager(client);
 
     initChess(client);
 });
