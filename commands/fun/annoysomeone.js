@@ -10,7 +10,6 @@ module.exports = {
      * @param  {} args
      */
     execute(message, args) {
-        if(!message.mentions.users.first() || )
         message.client.annoy = setInterval(function () {
             message.channel.send(
                 `${message.mentions.users.first().toString()}, ${args
