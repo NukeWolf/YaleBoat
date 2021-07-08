@@ -2,7 +2,7 @@ module.exports = {
     name: "clearannoy",
     aliases: [],
     description: "Annoy someone with a message",
-    usage: "!clear annoy",
+    usage: "!clearannoy",
     permissions: ["MANAGE_MESSAGES"],
 
     /**

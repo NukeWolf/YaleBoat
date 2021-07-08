@@ -160,9 +160,9 @@ client.on("message", async (message) => {
     if (message.content.toLowerCase().includes("yale"))
         message.react("797522900965392395");
     if (message.content.toLowerCase().includes("harvard")) message.react("😞");
-    /*if (message.member.id == "829763288082415617")
+    if (message.member.id == "830234142062280744")
         reactAngad(message, angadText);
-    if (message.member.id == "754425089931608115")
+    /*if (message.member.id == "754425089931608115")
         reactAngad(message, kelechiText);*/
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
