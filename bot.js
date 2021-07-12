@@ -10,6 +10,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.log = require("./util/log");
 const initChess = require("./util/initChess");
+const setupCron = require("./services/cron");
 
 /**
  * Gets the main Yale 2025 Guild
@@ -40,6 +41,7 @@ const commandFolders = fs
             client.commands.set(command.name, command);
         });
     });
+
 //DB Setup
 client.db = require("./util/db").init();
 
@@ -55,6 +57,7 @@ client.once("ready", async () => {
     // client.bulldog = new bulldogDaysManager(client);
 
     initChess(client);
+    setupCron(client);
 });
 
 client.on("inviteCreate", (invite) => {
