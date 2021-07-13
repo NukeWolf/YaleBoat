@@ -54,7 +54,7 @@ module.exports.init = () => {
     });
 
     function sync() {
-        this.Users.sync();
+        this.Users.sync({ alter: true });
     }
 
     return { sequelize, Users, sync };
