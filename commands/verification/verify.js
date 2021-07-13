@@ -4,6 +4,9 @@
  */
 
 const filter = require("../../util/filter");
+const sendVerificationEmail =
+    require("../../util/nodemail").sendVerificationEmail;
+
 const { roleId } = require("../../config");
 
 module.exports = {
@@ -51,6 +54,7 @@ module.exports = {
                 user.set("email", input);
                 user.set("authCode", code);
                 await user.save();
+                sendVerificationEmail(input, code);
                 return message.reply(
                     "A code has been sent to your yale email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
                 );

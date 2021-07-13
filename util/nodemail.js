@@ -13,10 +13,13 @@ let transporter = nodemailer.createTransport({
     },
 });
 
-var message = {
-    from: process.env.TRANSPORT_USERNAME,
-    to: "southtestah@gmail.com",
-    subject: "Confirmation of Matriculation to Yale.",
-};
-
-transporter.sendMail(message);
+function sendVerificationEmail(email, code) {
+    var message = {
+        from: process.env.TRANSPORT_USERNAME,
+        to: email,
+        subject: "Yale 2025 Discord Email Verification.",
+        text: `In order to finish the verification proccess, please use the following code/command below. Only send this code to the YaleBoat bot. \n\n Code: ${code} \n\n Command: !verify ${code}`,
+    };
+    transporter.sendMail(message);
+}
+module.exports.sendVerificationEmail = sendVerificationEmail;
