@@ -68,38 +68,26 @@ client.on("guildMemberAdd", async (member) => {
     //Check Invite and update accordingly
     client.inviteManager.onUserJoin(member);
 
-    /* const welcomeEmbed = new Discord.MessageEmbed()
+    const welcomeEmbed = new Discord.MessageEmbed()
         .attachFiles(["./src/bulldog.jpg"])
         .setColor("#0a47b8")
         .setTitle("Welcome to the Yale 2025 discord server!")
-        .setURL("https://apps.admissions.yale.edu/apply/update")
         .setDescription(
-            "In order to verify your account, we will need the link to your acceptance letter."
+            "In order to verify yale student status, we will need to verify your email. Start the verification proccess by typing `!verify <yale.edu email>`"
+        )
+        .addField("Example", "`!verify handsome.dan@yale.edu`")
+        .addField(
+            "**You will recieve an email afterwords with a 6 digit code. Verify using that code**",
+            "Ex. !verify 123456"
         )
         .addField(
-            "Login to your portal at the link below and once logged in, copy the URL in the search bar.",
-            "[https://apps.admissions.yale.edu/apply/update](https://apps.admissions.yale.edu/apply/update)"
-        )
-        .addField(
-            "After copying the link, respond to this dm with the command !verify [URL]",
-            "Ex. !verify https://apps.admissions.yale.edu/apply/update?idtoken=4101bef8794fed986e95dfb54850c68b"
-        )
-        .addField(
-            'If the link says, "No update to your application status to report", use this alternative link below and navigate to the acceptance letter yourself, and then copy the URL.',
-            "[https://apps.admissions.yale.edu/apply](https://apps.admissions.yale.edu/apply)"
-        )
-        .addField(
-            "Privacy",
-            "The ID you give is not linked to any of your personal information, nor does it allows us access or modify with the application. Its only purpose is to check if your application exists."
-        )
-        .addField(
-            "Contact and Help",
-            "If you need help with any of this, or can't access your portal, DM any of the admins on the server for verification help / admited role."
+            "**Contact and Help**",
+            "If you need help with any of this, or can't access your portal, DM any of the admins/moderators on the server for verification help / admited role."
         )
         .setImage("attachment://bulldog.jpg")
-        .setTimestamp()
-        .setFooter("*Your link may look a little different. UUIDv1"); */
-    const welcomeEmbed = new Discord.MessageEmbed()
+        .setTimestamp();
+
+    /*   const welcomeEmbed = new Discord.MessageEmbed()
         .attachFiles(["./src/bulldog.jpg"])
         .setColor("#0a47b8")
         .setTitle("Welcome to the Yale 2025 discord server!")
@@ -112,7 +100,8 @@ client.on("guildMemberAdd", async (member) => {
             "If you need help with the server, DM any of the admins on the server for help."
         )
         .setImage("attachment://bulldog.jpg")
-        .setTimestamp();
+        .setTimestamp(); */
+
     //Apropriate Welcome message based on verification database.
     const user = await client.db.Users.findOne({
         where: { user_id: member.id },
@@ -122,7 +111,7 @@ client.on("guildMemberAdd", async (member) => {
             member.send(
                 "Welcome to the Yale 2025 Discord Server!\nIn order to verify your account, please DM one of the admins for assistance."
             );
-        } else if (user.get("uuid")) {
+        } else if (user.get("verified")) {
             member.roles.add(roleId);
             member.send(
                 "Welcome back to the Yale 2025 Discord Server! Please reassign your roles."
