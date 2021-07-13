@@ -160,7 +160,10 @@ const reactAngad = async (message, reactArr) => {
 };
 
 client.on("message", async (message) => {
-    if (message.content.toLowerCase().includes("yale"))
+    if (
+        message.content.toLowerCase().includes("yale") &&
+        message.channel.type !== "dm"
+    )
         message.react("797522900965392395");
     if (message.content.toLowerCase().includes("harvard")) message.react("😞");
     // if (message.member?.id == "830234142062280744")
