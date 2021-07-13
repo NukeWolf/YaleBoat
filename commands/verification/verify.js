@@ -5,6 +5,7 @@
 
 const filter = require("../../util/filter");
 const { roleId } = require("../../config");
+
 module.exports = {
     name: "verify",
     aliases: [],
@@ -19,71 +20,96 @@ module.exports = {
     async execute(message, args) {
         const client = message.client;
         const Users = client.db.Users;
+
+        //Get user from id. May not exist
+        let user = await Users.findOne({
+            where: { user_id: message.author.id },
+        });
+        if (user && user.get("verified") === true)
+            return message.reply(
+                "You are already verified. Please contact an admin if further assistance is needed."
+            );
         if (!args.length)
-            return message.channel.send(`You didn't pass through any link!`);
-        await new Promise((r) => setTimeout(r, 2000));
-
-        const link = args[0];
-        const uuid = await filter(link, Users);
-        try {
-            if (!uuid.valid) {
-                if (uuid.malicious) {
-                    await Users.create({
-                        user_id: message.author.id,
-                        rawLink: link,
-                        malicious: true,
-                    });
-                    //Log the User
-                    client.log(
-                        "malicious",
-                        `**<@${message.author.id}> __is potentially malicious due to suspicious link entry. Request further verification.__\n - Link: ${link} \n - Reason: ${uuid.reason}**`,
-                        true
-                    );
-                }
-                return message.reply(uuid.error || "Error occurred.");
-            }
-            //If valid, Attempt to add them to DB
-            //Check if the user exists and they don't have a uuid
-            const user = await Users.findOne({
-                where: { user_id: message.author.id },
-            });
-            if (user && !user.get("uuid")) {
-                user.set("uuid", uuid.uuid);
-                user.set("rawLink", link);
-                await user.save();
-            } else {
-                await Users.create({
-                    user_id: message.author.id,
-                    uuid: uuid.uuid,
-                    rawLink: link,
-                });
-            }
-
-            const guild = await client.getMainGuild();
-            if (!guild.available) {
-                await Users.destroy({ where: { user_id: message.author.id } });
-                return message.reply(
-                    "Server is not available, please try again later."
-                );
-            }
-            //Add Role
-            const guildMember = guild.member(message.author);
-            guildMember.roles.add(roleId);
-
-            client.log(
-                "verification",
-                `<@${message.author.id}> has been verified.`,
-                true,
-                client
+            return message.channel.send(
+                `You didn't pass through any email or code! To start the verification proccess, do !verify <yale.edu email>.`
             );
 
+        const input = args[0].toLowerCase();
+        const emailValidation = /^[a-zA-Z0-9.]*@yale.edu$/;
+        const codeValidation = /^\d{6}$/;
+
+        try {
+            //Sending an email part
+            if (emailValidation.test(input)) {
+                //If user doesn't exist yet, create them
+                if (!user) {
+                    user = await Users.create({
+                        user_id: message.author.id,
+                    });
+                }
+                const code = Math.floor(100000 + Math.random() * 900000);
+                user.set("email", input);
+                user.set("authCode", code);
+                await user.save();
+                return message.reply(
+                    "A code has been sent to your yale email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
+                );
+            }
+            //Validating the code and having the role
+            if (codeValidation.test(input)) {
+                if (!user)
+                    return message.reply(
+                        "No user account found. Please do !verify <yale.edu email> first to get a code."
+                    );
+                //Check to see if the user has both of these columns
+                if (!(user.get("email") && user.get("authCode")))
+                    return message.reply(
+                        "Error in loading account details. Please do !verify <yale.edu email> again to get a new code."
+                    );
+                //If the code is correct then verify them and give role
+                if (user.get("authCode") === input) {
+                    const guild = await client.getMainGuild();
+                    if (!guild.available) {
+                        return message.reply(
+                            "Server is not available, please try again later."
+                        );
+                    }
+
+                    //Add Role
+                    const guildMember = guild.member(message.author);
+                    guildMember.roles.add(roleId);
+
+                    user.set("verified", true);
+                    user.set("authCode", 0);
+                    await user.save();
+
+                    client.log(
+                        "verification",
+                        `<@${message.author.id}> has been verified.`,
+                        true,
+                        client
+                    );
+
+                    return message.reply(
+                        "**ID succesfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**"
+                    );
+                }
+                //Invalid Code
+                else {
+                    return message.reply(
+                        "Invalid code. Please verify the correct digits were inputted. You may recieve a new code by typing !verify <email> again"
+                    );
+                }
+            }
+
+            //Invalid argument response
             return message.reply(
-                "**ID succesfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**"
+                "Invalid email or authentication code entered. Please try again."
             );
         } catch (e) {
             if (e.name === "SequelizeUniqueConstraintError") {
                 return message.reply(
-                    "This id has already been taken or you have been already verified."
+                    "This email has already been taken. Please contact an admin or moderator for extra assistance."
                 );
             }
             client.log("error", e);

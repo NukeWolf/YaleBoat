@@ -23,8 +23,9 @@ module.exports = {
         });
         if (!rowCount)
             return message.reply(
-                "You aren't verified yet. Please do !verify <URL> to verify."
+                "You aren't verified yet. Please do !verify <email> to start the verification proccess."
             );
+
         const guild = await client.getMainGuild();
         if (!guild.available)
             return message.reply(
@@ -39,7 +40,7 @@ module.exports = {
             true
         );
         return message.reply(
-            "Succesfully Unverified! You can now register another discord acount with this link, or do !verify to regain access to server."
+            "Succesfully Unverified! You can now register another discord acount with this email, or do !verify to regain access to server."
         );
     },
 };

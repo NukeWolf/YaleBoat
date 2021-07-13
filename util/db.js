@@ -1,32 +1,30 @@
-const Sequelize = require('sequelize')
+const Sequelize = require("sequelize");
 
 module.exports.init = () => {
-    var sequelize = null
+    var sequelize = null;
     if (process.env.DATABASE_URL) {
         sequelize = new Sequelize(process.env.DATABASE_URL, {
-            dialect:  'postgres',
-            protocol: 'postgres',
-            logging:  false, //false
+            dialect: "postgres",
+            protocol: "postgres",
+            logging: false, //false
             dialectOptions: {
-                ssl:{
+                ssl: {
                     require: true,
-                    rejectUnauthorized: false
-                }
-                
-            }
-        })
-    }
-    else{
-        sequelize = new Sequelize('database', 'user', 'password', {
-            host: 'localhost',
-            dialect: 'sqlite',
+                    rejectUnauthorized: false,
+                },
+            },
+        });
+    } else {
+        sequelize = new Sequelize("database", "user", "password", {
+            host: "localhost",
+            dialect: "sqlite",
             logging: false,
             // SQLite only
-            storage: 'database.sqlite',
+            storage: "database.sqlite",
         });
     }
 
-    const Users = sequelize.define('users', {
+    const Users = sequelize.define("users", {
         user_id: {
             type: Sequelize.STRING,
             primaryKey: true,
@@ -35,21 +33,29 @@ module.exports.init = () => {
             type: Sequelize.STRING,
             unique: true,
         },
-        rawLink: Sequelize.STRING,
+        email: {
+            type: Sequelize.STRING,
+            unique: true,
+        },
         malicious: {
             type: Sequelize.BOOLEAN,
-            defaultValue:false,
+            defaultValue: false,
         },
         courses: {
             type: Sequelize.JSON,
-        }
+        },
+        authCode: {
+            type: Sequelize.STRING,
+        },
+        verified: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false,
+        },
     });
 
-
     function sync() {
-        this.Users.sync()
+        this.Users.sync();
     }
 
-    return {sequelize,Users,sync}
-}
-    
+    return { sequelize, Users, sync };
+};
