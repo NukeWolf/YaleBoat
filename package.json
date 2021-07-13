@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@iamtraction/google-translate": "^1.1.2",
     "axios": "^0.21.1",
     "chess-image-generator": "^1.0.9",
     "chess.js": "^0.11.0",
@@ -24,8 +25,10 @@
     "lodash": "^4.17.20",
     "node-schedule": "^2.0.0",
     "nodemailer": "^6.5.0",
+    "number-to-words": "^1.2.4",
     "pg": "^8.5.1",
     "sequelize": "^6.3.5",
+    "to-zalgo": "^1.0.1",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },
