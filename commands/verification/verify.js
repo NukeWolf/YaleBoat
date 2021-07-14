@@ -84,9 +84,14 @@ module.exports = {
                         message.author.id == 228267348581154817 &&
                         !emailValidation.test(user.get("email"))
                     ) {
-                        return message.reply(
-                            "Psych bitch. Try again.\nhttps://media.tenor.com/images/955485b60ce8ff08bfaaab055bbd9b42/tenor.gif"
+                        await message.reply(
+                            "https://tenor.com/view/thats-it-rap-battle-sike-wrong-number-gif-11705029"
                         );
+                        return setTimeout(() => {
+                            message.reply(
+                                "https://tenor.com/view/funny-guy-gif-21573428"
+                            );
+                        }, 10000);
                     }
 
                     //Add Role
