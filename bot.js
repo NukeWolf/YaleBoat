@@ -1,6 +1,7 @@
 require("dotenv").config();
 const fs = require("fs");
 const Discord = require("discord.js");
+require("discord-reply");
 const { prefix, roleId, mainGuild } = require("./config");
 const inviteManager = require("./services/inviteManager");
 const stateManager = require("./services/stateManager");
@@ -160,7 +161,19 @@ client.on("message", async (message) => {
     /*if (message.member.id == "754425089931608115")
         reactAngad(message, kelechiText);*/
 
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    if (message.author.bot) return;
+
+    if (message.channel.name === "general") {
+        const morse = /^[+.|\s\-…\/\–\—\−]+$/;
+        if (!morse.test(message.content)) {
+            await message.lineReply("-- --- .-. ... . / --- -. .-.. -.--");
+            return setTimeout(() => {
+                message.delete();
+            }, 2000);
+        }
+    }
+    if (!message.content.startsWith(prefix)) return;
+
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     //Finds Commands and exits early if no alias is found.
