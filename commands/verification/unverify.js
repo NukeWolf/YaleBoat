@@ -7,7 +7,7 @@ const { roleId } = require("../../config");
 module.exports = {
     name: "unverify",
     aliases: [],
-    description: "Unverifys a user and unlinks their account to the ID",
+    description: "Unverify a user and unlinks their account to the ID",
     dmOnly: true,
     /**
      * Execute Function
@@ -23,7 +23,7 @@ module.exports = {
         });
         if (!rowCount)
             return message.reply(
-                "You aren't verified yet. Please do !verify <email> to start the verification proccess."
+                "You aren't verified yet. Please do !verify <email> to start the verification process."
             );
 
         const guild = await client.getMainGuild();
@@ -40,7 +40,7 @@ module.exports = {
             true
         );
         return message.reply(
-            "Succesfully Unverified! You can now register another discord acount with this email, or do !verify to regain access to server."
+            "Successfully Unverified! You can now register another discord account with this email, or do !verify to regain access to server."
         );
     },
 };

@@ -74,16 +74,16 @@ client.on("guildMemberAdd", async (member) => {
         .setColor("#0a47b8")
         .setTitle("Welcome to the Yale 2025 discord server!")
         .setDescription(
-            "In order to verify yale student status, we will need to verify your email. Start the verification proccess by typing `!verify <yale.edu email>`"
+            "In order to verify yale student status, we will need to verify your email. Start the verification process by typing `!verify <yale.edu email>`"
         )
         .addField("Example", "`!verify handsome.dan@yale.edu`")
         .addField(
-            "**You will recieve an email afterwords with a 6 digit code. Verify using that code**",
+            "**You will receive an email afterwords with a 6 digit code. Verify using that code**",
             "Ex. !verify 123456"
         )
         .addField(
             "**Contact and Help**",
-            "If you need help with any of this, or can't access your portal, DM any of the admins/moderators on the server for verification help / admited role."
+            "If you need help with any of this, or can't access your portal, DM any of the admins/moderators on the server for verification help / admitted role."
         )
         .setImage("attachment://bulldog.jpg")
         .setTimestamp();
@@ -103,7 +103,7 @@ client.on("guildMemberAdd", async (member) => {
         .setImage("attachment://bulldog.jpg")
         .setTimestamp(); */
 
-    //Apropriate Welcome message based on verification database.
+    //Appropriate Welcome message based on verification database.
     const user = await client.db.Users.findOne({
         where: { user_id: member.id },
     });
@@ -162,16 +162,6 @@ client.on("message", async (message) => {
         reactAngad(message, kelechiText);*/
 
     if (message.author.bot) return;
-
-    if (message.channel.name === "general") {
-        const morse = /^[+.|\s\-…\/\–\—\−,]+$/;
-        if (!morse.test(message.content)) {
-            await message.lineReply("-- --- .-. ... . / --- -. .-.. -.--");
-            return setTimeout(() => {
-                message.delete();
-            }, 2000);
-        }
-    }
     if (!message.content.startsWith(prefix)) return;
 
     const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -210,7 +200,7 @@ client.on("message", async (message) => {
     } catch (err) {
         client.log("error", err);
         message.reply(
-            "There as an error executing your comamnd. Please contact an Admin."
+            "There as an error executing your command. Please contact an Admin."
         );
     }
 });

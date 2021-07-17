@@ -12,7 +12,7 @@ const { roleId } = require("../../config");
 module.exports = {
     name: "verify",
     aliases: [],
-    description: "Verifys a user along with an argument of a link",
+    description: "Verifies a user along with an argument of a link",
     dmOnly: true,
     /**
      * Execute Function
@@ -34,7 +34,7 @@ module.exports = {
             );
         if (!args.length)
             return message.channel.send(
-                `You didn't pass through any email or code! To start the verification proccess, do !verify <yale.edu email>.`
+                `You didn't pass through any email or code! To start the verification process, do !verify <yale.edu email>.`
             );
 
         const input = args[0].toLowerCase();
@@ -110,13 +110,13 @@ module.exports = {
                     );
 
                     return message.reply(
-                        "**ID succesfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**"
+                        "**ID successfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**"
                     );
                 }
                 //Invalid Code
                 else {
                     return message.reply(
-                        "Invalid code. Please verify the correct digits were inputted. You may recieve a new code by typing !verify <email> again"
+                        "Invalid code. Please verify the correct digits were inputted. You may receive a new code by typing !verify <email> again"
                     );
                 }
             }
@@ -156,7 +156,9 @@ module.exports = {
                 );
             }
             client.log("error", e);
-            return message.reply("Error has Occured. Please contact an Admin.");
+            return message.reply(
+                "Error has Occurred. Please contact an Admin."
+            );
         }
     },
 };
