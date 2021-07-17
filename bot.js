@@ -164,7 +164,7 @@ client.on("message", async (message) => {
     if (message.author.bot) return;
 
     if (message.channel.name === "general") {
-        const morse = /^[+.|\s\-…\/\–\—\−]+$/;
+        const morse = /^[+.|\s\-…\/\–\—\−,]+$/;
         if (!morse.test(message.content)) {
             await message.lineReply("-- --- .-. ... . / --- -. .-.. -.--");
             return setTimeout(() => {
