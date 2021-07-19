@@ -54,10 +54,27 @@ module.exports = {
                 user.set("email", input);
                 user.set("authCode", code);
                 await user.save();
-                sendVerificationEmail(input, code);
-                return message.reply(
-                    "A code has been sent to your yale email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
-                );
+                try {
+                    const loading = await message.reply(
+                        "Sending email . . . (If this message doesn't go away within 15 seconds, please contact an admin.)"
+                    );
+                    await sendVerificationEmail(input, code);
+                    await loading.delete();
+                    return message.reply(
+                        "A code has been sent to your yale email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
+                    );
+                } catch (err) {
+                    client.log(
+                        "verification",
+                        `<@${message.author.id}> could not receive at email \`${input}\`. Please contact them.`,
+                        true,
+                        client
+                    );
+                    client.log("error", err, true, client);
+                    return message.reply(
+                        "Email services are currently down are an invalid email was entered. Please contact one of the moderators for additional help / manual verification."
+                    );
+                }
             }
             //Validating the code and having the role
             if (codeValidation.test(input)) {
