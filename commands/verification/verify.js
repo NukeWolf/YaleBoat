@@ -79,21 +79,6 @@ module.exports = {
                         );
                     }
 
-                    //Still for lucas :)
-                    if (
-                        message.author.id == 228267348581154817 &&
-                        !emailValidation.test(user.get("email"))
-                    ) {
-                        await message.reply(
-                            "https://tenor.com/view/thats-it-rap-battle-sike-wrong-number-gif-11705029"
-                        );
-                        return setTimeout(() => {
-                            message.reply(
-                                "https://tenor.com/view/funny-guy-gif-21573428"
-                            );
-                        }, 10000);
-                    }
-
                     //Add Role
                     const guildMember = guild.member(message.author);
                     guildMember.roles.add(roleId);
@@ -117,30 +102,6 @@ module.exports = {
                 else {
                     return message.reply(
                         "Invalid code. Please verify the correct digits were inputted. You may receive a new code by typing !verify <email> again"
-                    );
-                }
-            }
-
-            //Just for lucas
-            const anyEmail =
-                /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-            //Lucas Test
-            if (message.author.id == 228267348581154817) {
-                //Tests for any regular email
-                if (anyEmail.test(input)) {
-                    //If user doesn't exist yet, create them
-                    if (!user) {
-                        user = await Users.create({
-                            user_id: message.author.id,
-                        });
-                    }
-                    const code = Math.floor(100000 + Math.random() * 900000);
-                    user.set("email", input);
-                    user.set("authCode", code);
-                    await user.save();
-                    sendVerificationEmail(input, code);
-                    return message.reply(
-                        "A code has been sent to your `normal` email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
                     );
                 }
             }
