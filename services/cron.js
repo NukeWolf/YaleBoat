@@ -10,7 +10,6 @@ const languages = {
     fr: "French",
     es: "Spanish",
     ar: "Arabic",
-    cn: "Mandarin",
     ru: "Russian",
     pt: "Portuguese",
     de: "German",
@@ -62,7 +61,7 @@ const aug8 = (client) => {
             converter.toWords(daysLeft) + " days left until august eighth";
 
         const textTranslated = await translate(whatsLeft, {
-            to: Object.keys(languages)[daysLeft - 3],
+            to: Object.keys(languages)[daysLeft - 4],
         });
         const channel = client.channels.cache.find(
             (channel) => channel.name === "happy-campers-chat"

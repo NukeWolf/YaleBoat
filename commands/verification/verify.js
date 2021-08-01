@@ -54,16 +54,17 @@ module.exports = {
                 user.set("email", input);
                 user.set("authCode", code);
                 await user.save();
+                const loading = await message.reply(
+                    "Sending email . . . (If this message doesn't go away within 15 seconds, please contact an admin.)"
+                );
                 try {
-                    const loading = await message.reply(
-                        "Sending email . . . (If this message doesn't go away within 15 seconds, please contact an admin.)"
-                    );
                     await sendVerificationEmail(input, code);
                     await loading.delete();
                     return message.reply(
                         "A code has been sent to your yale email for verification. Please check the email and verify with the 6 digit code by typing\n`!verify <6 digit code>`\n`Example: !verify 123456`"
                     );
                 } catch (err) {
+                    await loading.delete();
                     client.log(
                         "verification",
                         `<@${message.author.id}> could not receive at email \`${input}\`. Please contact them.`,
@@ -72,7 +73,7 @@ module.exports = {
                     );
                     client.log("error", err, true, client);
                     return message.reply(
-                        "Email services are currently down are an invalid email was entered. Please contact one of the moderators for additional help / manual verification."
+                        "Email services are currently down or an invalid email was entered. Please contact one of the moderators for additional help / manual verification."
                     );
                 }
             }
