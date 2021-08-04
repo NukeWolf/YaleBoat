@@ -48,6 +48,9 @@ const aug8 = (client) => {
     dailyRule.minute = 1;
     dailyRule.tz = "America/New_York";
     const sendMessage = async () => {
+        const channel = client.channels.cache.find(
+            (channel) => channel.name === "happy-campers-chat"
+        );
         const today = new Date();
         const cmas = new Date(today.getFullYear(), 07, 8);
         if (today.getMonth() === 08 && today.getDate() > 8) {
@@ -60,13 +63,31 @@ const aug8 = (client) => {
         const whatsLeft =
             converter.toWords(daysLeft) + " days left until august eighth";
 
-        const textTranslated = await translate(whatsLeft, {
-            to: Object.keys(languages)[daysLeft - 4],
-        });
-        const channel = client.channels.cache.find(
-            (channel) => channel.name === "happy-campers-chat"
-        );
-        await channel.send(textTranslated.text);
+        if (daysLeft - 4 >= 0) {
+            const textTranslated = await translate(whatsLeft, {
+                to: Object.keys(languages)[daysLeft - 4],
+            });
+
+            await channel.send(textTranslated.text);
+        }
+
+        if (daysLeft - 4 == -1) {
+            return channel.send({ files: ["https://i.imgur.com/HUQhy4E.gif"] });
+        }
+        if (daysLeft - 4 == -2) {
+            return channel.send({
+                files: [
+                    "https://thumbs.gfycat.com/InnocentCraftyEquine-size_restricted.gif",
+                ],
+            });
+        }
+        if (daysLeft - 4 == -3) {
+            return channel.send({
+                files: [
+                    "https://media1.tenor.com/images/2bd6ba581d518dd759a4de86df7dccce/tenor.gif?itemid=9607331",
+                ],
+            });
+        }
 
         const dateFact = await axios.get("http://numbersapi.com/8/8/date");
         const triviaFact = await axios.get("http://numbersapi.com/" + daysLeft);
@@ -75,7 +96,7 @@ const aug8 = (client) => {
         );
         const embed = {
             color: 0x0f4d92,
-            title: textTranslated.text,
+            title: whatsLeft,
             fields: [
                 {
                     name: "a̴̧̡̧̨̨̡͇̯͓̺̻͇̼̻̯͖̤̺͖̜͈͓̣̤͎͔̣͔̜͍͍͓̪̻͉͓̬̤͎͇̻̯̾͗̓̌́͜͝ư̵̛͕̤͕͎̠͇̗̯̜̬̰̬͖͑̎̀̈́̓̇͑̑̓̽́́̉̋͋̔͘͜͠g̴̡̢̨̛̦͍̺̙͍͕͈̞͉͓̻̙͉̫̮̳̙͇͔͈̜̮͎̳̗̼̪̼̜̺̝̺͎̗̘̑̓̈́̒͑͌̅͐̀͗̎̈́͂͛͑́̐̐̈͛̔̈́͆̔͑̓̈́̂̀͌̉̿͑̅͗͐̚̚͘͘͜͝͝ ̷̡̡̨̗̯͓̼͖͇̗̗̯̗̣̯͕͓̘̭̘̥̰͙̝̣̉ͅ8̵̡̡̨̨̛̛̛̤͙̺̘͉̘̩̦̠̙̯͍͉̻͆̒̿̑̐̐͋̍̾̈́́́͑͂̀́̈̅̇̀̾͑̾̈́̔͐̒̂̋̚͘͘͝͠͝͠͠ͅ",
