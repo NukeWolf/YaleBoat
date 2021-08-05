@@ -8,7 +8,7 @@ const _ = require("lodash");
 
 const fs = require("fs");
 const rawImages = fs.readFileSync("src/liminalspaces.txt").toString("utf-8");
-const liminalImages = rawImages.split("\r\n");
+const liminalImages = rawImages.split("\n");
 const languages = {
     en: "English",
     fr: "French",
