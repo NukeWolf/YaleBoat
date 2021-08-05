@@ -4,7 +4,11 @@ const translate = require("@iamtraction/google-translate");
 const zalgo = require("to-zalgo");
 const converter = require("number-to-words");
 const axios = require("axios").default;
+const _ = require("lodash");
 
+const fs = require("fs");
+const rawImages = fs.readFileSync("src/liminalspaces.txt").toString("utf-8");
+const liminalImages = rawImages.split("\r\n");
 const languages = {
     en: "English",
     fr: "French",
@@ -36,6 +40,23 @@ const languages = {
  */
 setupCronFunctions = (client) => {
     aug8(client);
+
+    const channel = client.channels.cache.find(
+        (channel) => channel.name === "happy-campers-chat"
+    );
+    //For random messages and trivia
+    const collector = channel.createMessageCollector((m) => {
+        return !m.author.bot;
+    });
+    collector.on("collect", () => {
+        const random = Math.random() * 100;
+        if (random < 1) {
+            const url = _.sample(liminalImages);
+            channel.send({
+                files: [url],
+            });
+        }
+    });
 };
 //" days left u̸̡͙͚̦̳̹͇̭̬̳͍̹͋̒ͅn̸̟̭̲͕͈̞̫̿̃̿́̐̃̇͒̍̊͌̃͜͝t̷̝̠͉̊͠ĭ̴̡̪̮͙̱̩̝̊̉́́̚ĺ̷̠̟̣̆̓̔̕͝ ã̷̧̛̱̌̐̅͒̈́̌̾̿̚̕͝ư̴̛͖̺̟̲̅̾̉̉̾͋̓͌͘̚g̴̡̛̞̺̭̰͚͉͈̪͖̰̾͋̂̍̈́̕͝ͅ ̷̮̥̖̘̜̀̑̈̎̂̈́̇́̑̕͜͠8̷̨̼̬̳͕͇̺̳̝͇͈̮̝͋̐̈́́͒͂̿͝ͅ";
 module.exports = setupCronFunctions;
