@@ -44,7 +44,7 @@ setupCronFunctions = (client) => {
     const channel = client.channels.cache.find(
         (channel) => channel.name === "happy-campers-chat"
     );
-    //For random messages and trivia
+    /*  //For random messages and trivia
     const collector = channel.createMessageCollector((m) => {
         return !m.author.bot;
     });
@@ -56,7 +56,7 @@ setupCronFunctions = (client) => {
                 files: [url],
             });
         }
-    });
+    }); */
     console.log(liminalImages);
 };
 //" days left u̸̡͙͚̦̳̹͇̭̬̳͍̹͋̒ͅn̸̟̭̲͕͈̞̫̿̃̿́̐̃̇͒̍̊͌̃͜͝t̷̝̠͉̊͠ĭ̴̡̪̮͙̱̩̝̊̉́́̚ĺ̷̠̟̣̆̓̔̕͝ ã̷̧̛̱̌̐̅͒̈́̌̾̿̚̕͝ư̴̛͖̺̟̲̅̾̉̉̾͋̓͌͘̚g̴̡̛̞̺̭̰͚͉͈̪͖̰̾͋̂̍̈́̕͝ͅ ̷̮̥̖̘̜̀̑̈̎̂̈́̇́̑̕͜͠8̷̨̼̬̳͕͇̺̳̝͇͈̮̝͋̐̈́́͒͂̿͝ͅ";
