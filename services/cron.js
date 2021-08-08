@@ -110,6 +110,43 @@ const aug8 = (client) => {
                 ],
             });
         }
+        if (daysLeft - 4 == -4) {
+            const message = await channel.send(
+                "Y̸o̵u̸'̸v̵e̴ ̷M̶e̸t̵ ̴W̸i̵t̴h̵ ̶A̶ ̶T̴e̸r̴r̴i̶b̸l̸e̸ ̵F̴a̴t̷e̷ ̸H̷a̶v̴e̵n̷'̴t̵ ̷Y̸o̷u̷"
+            );
+            const reactions = ["⬆️", "⬇️", "⬅️", "➡️", "🅰️", "🅱️"];
+            const songOfTime = ["➡️", "🅰️", "⬇️", "➡️", "🅰️", "⬇️"];
+            let playedNotes = [];
+            for (let i = 0; i < reactions.length; i++) {
+                await message.react(reactions[i]);
+            }
+            const reactionCollector = message.createReactionCollector(
+                (reaction, user) => {
+                    return reactions.includes(reaction.emoji.name);
+                }
+            );
+            reactionCollector.on("collect", async (reaction, user) => {
+                playedNotes.push(reaction.emoji.name);
+                if (playedNotes.length > 6) {
+                    playedNotes.shift();
+                }
+                reaction.users.remove(user);
+                //If Song is played
+                if (playedNotes.toString() === songOfTime.toString()) {
+                    await channel.send({ files: ["src/songoftime.mp3"] });
+                    await new Promise((r) => setTimeout(r, 20000));
+                    await channel.send({
+                        files: ["https://i.imgur.com/HUQhy4E.gif"],
+                    });
+                    await channel.send({
+                        files: [
+                            "src/1.wav",
+                            "src/2.Do-you-hear-the-people-sing.mp3",
+                        ],
+                    });
+                }
+            });
+        }
 
         const dateFact = await axios.get("http://numbersapi.com/8/8/date");
         const triviaFact = await axios.get("http://numbersapi.com/" + daysLeft);
@@ -135,10 +172,11 @@ const aug8 = (client) => {
             ],
             timestamp: new Date(),
         };
-        await channel.send({ embed: embed });
+        //await channel.send({ embed: embed });
         // await channel.send(zalgo(dateFact.data));
         // await channel.send(zalgo(triviaFact.data));
         // await channel.send(zalgo(mathFact.data));
     };
+
     const job = schedule.scheduleJob(dailyRule, sendMessage);
 };
