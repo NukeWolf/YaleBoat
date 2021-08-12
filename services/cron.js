@@ -168,6 +168,5 @@ const aug8 = (client) => {
         // await channel.send(zalgo(triviaFact.data));
         // await channel.send(zalgo(mathFact.data));
     };
-    sendMessage();
     const job = schedule.scheduleJob(dailyRule, sendMessage);
 };
