@@ -57,7 +57,6 @@ setupCronFunctions = (client) => {
             });
         }
     }); */
-    console.log(liminalImages);
 };
 //" days left u̸̡͙͚̦̳̹͇̭̬̳͍̹͋̒ͅn̸̟̭̲͕͈̞̫̿̃̿́̐̃̇͒̍̊͌̃͜͝t̷̝̠͉̊͠ĭ̴̡̪̮͙̱̩̝̊̉́́̚ĺ̷̠̟̣̆̓̔̕͝ ã̷̧̛̱̌̐̅͒̈́̌̾̿̚̕͝ư̴̛͖̺̟̲̅̾̉̉̾͋̓͌͘̚g̴̡̛̞̺̭̰͚͉͈̪͖̰̾͋̂̍̈́̕͝ͅ ̷̮̥̖̘̜̀̑̈̎̂̈́̇́̑̕͜͠8̷̨̼̬̳͕͇̺̳̝͇͈̮̝͋̐̈́́͒͂̿͝ͅ";
 module.exports = setupCronFunctions;
@@ -74,7 +73,7 @@ const aug8 = (client) => {
             (channel) => channel.name === "happy-campers-chat"
         );
         const today = new Date();
-        const cmas = new Date(today.getFullYear(), 07, 8);
+        const cmas = new Date(today.getFullYear() + 1, 07, 8);
         if (today.getMonth() === 08 && today.getDate() > 8) {
             cmas.setFullYear(cmas.getFullYear() + 1);
         }
@@ -84,14 +83,6 @@ const aug8 = (client) => {
         );
         const whatsLeft =
             converter.toWords(daysLeft) + " days left until august eighth";
-
-        if (daysLeft - 4 >= 0) {
-            const textTranslated = await translate(whatsLeft, {
-                to: Object.keys(languages)[daysLeft - 4],
-            });
-
-            await channel.send(textTranslated.text);
-        }
 
         if (daysLeft - 4 == -1) {
             return channel.send({ files: ["https://i.imgur.com/HUQhy4E.gif"] });
@@ -172,11 +163,11 @@ const aug8 = (client) => {
             ],
             timestamp: new Date(),
         };
-        //await channel.send({ embed: embed });
+        await channel.send({ embed: embed });
         // await channel.send(zalgo(dateFact.data));
         // await channel.send(zalgo(triviaFact.data));
         // await channel.send(zalgo(mathFact.data));
     };
-
+    sendMessage();
     const job = schedule.scheduleJob(dailyRule, sendMessage);
 };
