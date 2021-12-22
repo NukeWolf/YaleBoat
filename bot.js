@@ -62,10 +62,12 @@ client.once("ready", async () => {
 });
 
 client.on("inviteCreate", (invite) => {
+    if (invite.guild.id != mainGuild) return;
     client.inviteManager.onInviteCreate(invite);
 });
 
 client.on("guildMemberAdd", async (member) => {
+    if (invite.guild.id != mainGuild) return;
     //Check Invite and update accordingly
     client.inviteManager.onUserJoin(member);
 
