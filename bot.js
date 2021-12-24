@@ -68,6 +68,7 @@ client.once("ready", async () => {
         }
         //Invite manager with log channel
         const log = await guild.channels.resolve(logChannel);
+        guild.logChannel = log;
         guild.inviteManager = new inviteManager({ guild, channel: log });
     });
     // Deprecated, Still is hardcoded to 2025
@@ -158,7 +159,7 @@ client.on("guildMemberAdd", async (member) => {
                     "Couldn't send welcome verification/message to " +
                         member.toString() +
                         ".",
-                    true
+                    member.guild
                 );
             });
         }
@@ -169,7 +170,7 @@ client.on("guildMemberAdd", async (member) => {
                 "Couldn't send welcome verification/message to " +
                     member.toString() +
                     ".",
-                true
+                member.guild
             );
         });
     }

@@ -37,6 +37,7 @@ module.exports = {
         client.log(
             "verification",
             `<@${message.author.id}> has been unverified.`,
+            //TODO: Client LOGS are now Guild based
             true
         );
         return message.reply(

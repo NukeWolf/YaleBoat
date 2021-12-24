@@ -89,10 +89,10 @@ module.exports = class StateManager {
                         );
                     })
                     .catch((e) => {
-                        client.log(
+                        this.guild.client.log(
                             "error",
                             `${user} can't add role ${state}.`,
-                            true
+                            this.guild
                         );
                         user.send(
                             "Error occurred while attempting to add your role."

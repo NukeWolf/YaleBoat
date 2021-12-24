@@ -89,10 +89,10 @@ module.exports = class inviteManager {
         if (updatedInvite) {
             const message = await this.fetchMessage(updatedInvite);
             if (!message)
-                return this.client.log(
+                return member.client.log(
                     "error",
                     `${member.toString()} joined with ${updatedInvite.code}`,
-                    true
+                    this.guild
                 );
             const oldEmbed = message.embeds[0];
             //Update Uses

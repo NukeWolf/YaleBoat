@@ -35,6 +35,7 @@ module.exports = {
                         malicious: true,
                     });
                     //Log the User
+                    //TODO: Client LOGS are now Guild based
                     client.log(
                         "malicious",
                         `**<@${message.author.id}> __is potentially malicious due to suspicious link entry. Request further verification.__\n - Link: ${link} \n - Reason: ${uuid.reason}**`,
@@ -71,6 +72,7 @@ module.exports = {
             const guildMember = guild.member(message.author);
             guildMember.roles.add(roleId);
 
+            //TODO: Client LOGS are now Guild based
             client.log(
                 "verification",
                 `<@${message.author.id}> has been verified.`,

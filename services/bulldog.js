@@ -205,6 +205,7 @@ module.exports = class bulldogDaysManager {
                 await channel.send({ embed: eventEmbed });
             }
         } catch (e) {
+            //TODO: Client LOGS are now Guild based
             this.client.log("error", "Issue with posting an event", true);
             console.log(e);
         }

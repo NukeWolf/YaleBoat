@@ -65,6 +65,8 @@ module.exports = {
                     );
                 } catch (err) {
                     await loading.delete();
+                    //TODO: Client LOGS are now Guild based
+
                     client.log(
                         "verification",
                         `<@${message.author.id}> could not receive at email \`${input}\`. Please contact them.`,

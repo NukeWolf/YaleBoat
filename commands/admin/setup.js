@@ -17,7 +17,7 @@ module.exports = {
             case "createStateRoles":
                 setupStateRoles(message);
                 break;
-            case "setupStates":
+            case "stateMessages":
                 setupStateEmojis(message);
                 break;
             case "deleteStateRoles":
@@ -30,7 +30,7 @@ module.exports = {
  * @param  {import('discord.js').Message} message
  */
 const setupStateRoles = async (message) => {
-    const guild = await message.client.getMainGuild();
+    const guild = message.guild;
     Object.entries(stateAbbreviations).forEach((state) => {
         guild.roles.create({
             data: {
@@ -39,11 +39,11 @@ const setupStateRoles = async (message) => {
             },
         });
     });
-    message.client.log("info", "Added State Roles", true);
+    message.client.log("info", "Added State Roles", message.guild);
 };
 
 const deleteStateRoles = async (message) => {
-    const guild = await message.client.getMainGuild();
+    const guild = message.guild;
     Object.values(stateAbbreviations).forEach((state) => {
         const role = guild.roles.cache.find((role) => state === role.name);
         if (role)
@@ -51,7 +51,7 @@ const deleteStateRoles = async (message) => {
                 console.log(`Role ${state} didn't exist`);
             });
     });
-    message.client.log("info", "Deleted State Roles", true);
+    message.client.log("info", "Deleted State Roles", message.guild);
 };
 /**
  * @param  {import('discord.js').Message} message

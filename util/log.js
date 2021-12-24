@@ -22,14 +22,10 @@ const logger = winston.createLogger({
     ),
 });
 
-function log(type, message, sendDiscord) {
+function log(type, message, guild) {
     logger.log(type, message);
-    if (sendDiscord) {
-        this.getMainGuild().then((guild) => {
-            guild.channels
-                .resolve(adminChannel)
-                .send(`[${type.toUpperCase()}] - ${message}`);
-        });
+    if (guild) {
+        guild.logChannel.send(`[${type.toUpperCase()}] - ${message}`);
     }
 }
 
