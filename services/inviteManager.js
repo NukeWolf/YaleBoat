@@ -1,4 +1,3 @@
-const { adminChannel } = require("../config");
 const Discord = require("discord.js");
 
 function formatTime(unix, delim = "\n") {
@@ -69,16 +68,10 @@ const createInviteEmbed = (invite) => {
 
 module.exports = class inviteManager {
     //Gets reference list
-    constructor(client) {
-        this.client = client;
-        client
-            .getMainGuild()
-            .then((guild) =>
-                guild.fetchInvites().then((list) => (this.inviteList = list))
-            )
-            .catch((e) => {
-                client.log("error", e);
-            });
+    constructor({ guild, channel }) {
+        this.guild = guild;
+        this.channel = channel;
+        guild.fetchInvites().then((list) => (this.inviteList = list));
     }
     /**
      * Adds the member to the invite log when joined and tracks which invite link they used, by comparing a old cached list of invites with a new invite list.
@@ -130,8 +123,7 @@ module.exports = class inviteManager {
     };
     onInviteCreate = async (invite) => {
         const guild = invite.guild;
-        const channel = guild.channels.resolve(adminChannel);
-        await channel.send(createInviteEmbed(invite));
+        await this.channel.send(createInviteEmbed(invite));
         this.inviteList = await guild.fetchInvites();
     };
     /**
@@ -139,8 +131,7 @@ module.exports = class inviteManager {
      */
     fetchMessage = async (invite) => {
         const guild = invite.guild;
-        const channel = guild.channels.resolve(adminChannel);
-        const messages = await channel.messages.fetch({ limit: 100 });
+        const messages = await this.channel.messages.fetch({ limit: 100 });
         const inviteCode = invite.code;
         const message = messages.find((message) => {
             if (message.embeds.length == 0) return false;

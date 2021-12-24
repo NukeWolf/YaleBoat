@@ -54,18 +54,23 @@ client.once("ready", async () => {
     client.user.setPresence({ activity: { name: "Try !chess; !course" } });
     client.log("info", "Bot is now Online!");
 
+    //For each guild, setup appropriate settings and managers
     client.guilds.cache.forEach(async (guild) => {
         const guildDB = await client.db.Guilds.findByPk(guild.id);
-        const { stateManagerConfig } = guildDB.get("config");
+        const { stateManagerConfig, logChannel } = guildDB.get("config");
+
+        //State manager
         if (stateManagerConfig) {
             guild.stateManager = new stateManager({
                 ...stateManagerConfig,
                 guild,
             });
         }
+        //Invite manager with log channel
+        const log = await guild.channels.resolve(logChannel);
+        guild.inviteManager = new inviteManager({ guild, channel: log });
     });
-
-    client.inviteManager = new inviteManager(client);
+    // Deprecated, Still is hardcoded to 2025
     // client.bulldog = new bulldogDaysManager(client);
 
     initChess(client);
@@ -73,8 +78,7 @@ client.once("ready", async () => {
 });
 
 client.on("inviteCreate", (invite) => {
-    if (invite.guild.id != mainGuild) return;
-    client.inviteManager.onInviteCreate(invite);
+    invite.guild.inviteManager.onInviteCreate(invite);
 });
 
 client.on("guildCreate", async (guild) => {
@@ -84,18 +88,21 @@ client.on("guildCreate", async (guild) => {
     });
     if (created) {
         const channel = await guild.channels.create("yaleboat-logs");
+        //Welcome Message
         channel.send("Thanks for using Yaleboat!");
-        guildObj.set("config", { logChannel: channel.id });
 
+        //Setups invite manager automatically
+        guild.inviteManager = new inviteManager({ guild, channel });
+
+        guildObj.set("config", { logChannel: channel.id });
         guildObj.save();
     }
 });
 
 client.on("guildMemberAdd", async (member) => {
-    if (invite.guild.id != mainGuild) return;
     //Check Invite and update accordingly
-    client.inviteManager.onUserJoin(member);
-
+    member.guild.inviteManager.onUserJoin(member);
+    if (member.guild.id != mainGuild) return;
     const welcomeEmbed = new Discord.MessageEmbed()
         .attachFiles(["./src/bulldog.jpg"])
         .setColor("#0a47b8")

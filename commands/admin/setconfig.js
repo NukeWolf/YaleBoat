@@ -26,6 +26,7 @@ module.exports = {
                 break;
             case "logChannel":
                 guildDB.config.logChannel = args[1];
+                guildDB.changed("config", true);
                 break;
             default:
                 return message.channel.send("Invalid Property");
