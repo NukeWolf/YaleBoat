@@ -70,6 +70,8 @@ client.once("ready", async () => {
         const log = await guild.channels.resolve(logChannel);
         guild.logChannel = log;
         guild.inviteManager = new inviteManager({ guild, channel: log });
+
+        guild.config = guildDB.get("config");
     });
     // Deprecated, Still is hardcoded to 2025
     // client.bulldog = new bulldogDaysManager(client);
@@ -82,6 +84,27 @@ client.on("inviteCreate", (invite) => {
     invite.guild.inviteManager.onInviteCreate(invite);
 });
 
+const YaleBoatWelcome = new Discord.MessageEmbed()
+    .attachFiles(["./src/bulldog.jpg"])
+    .setColor("#0a47b8")
+    .setTitle("Thanks for using Yaleboat!")
+    .setDescription(
+        "Yaleboat is a bot created by Alex Huang '25 for basic administration features, extra features, and verification. There's not that many features currently, but if you have any requests, I'd be happy to hear them."
+    )
+    .addField(
+        "State Roles",
+        "Use `!setup stateMessages` in your role selection channel and `!setup createStateRoles` to create the role menu and appropriate roles to select a state."
+    )
+    .addField(
+        "This channel will be Yaleboat logging channel. Any new invites created will be logged here and also which invites people come from.",
+        "If you want to change this channel, DM <@216298660424712192>"
+    )
+    .addField(
+        "Misc setup",
+        "Use !setconfig yaleReact <id of emoji> to setup a custom emoji to react to the word Yale."
+    )
+    .setImage("attachment://bulldog.jpg")
+    .setTimestamp();
 client.on("guildCreate", async (guild) => {
     const Guilds = client.db.Guilds;
     const [guildObj, created] = await Guilds.findOrCreate({
@@ -90,13 +113,17 @@ client.on("guildCreate", async (guild) => {
     if (created) {
         const channel = await guild.channels.create("yaleboat-logs");
         //Welcome Message
-        channel.send("Thanks for using Yaleboat!");
+        channel.send(YaleBoatWelcome);
 
         //Setups invite manager automatically
         guild.inviteManager = new inviteManager({ guild, channel });
 
-        guildObj.set("config", { logChannel: channel.id });
-        guildObj.save();
+        const defaultConfig = { logChannel: channel.id, yaleReact: "💙" };
+
+        guildObj.set("config", defaultConfig);
+        await guildObj.save();
+
+        guild.config = defaultConfig;
     }
 });
 
@@ -189,7 +216,7 @@ client.on("message", async (message) => {
         message.content.toLowerCase().includes("yale") &&
         message.channel.type !== "dm"
     )
-        message.react("797522900965392395");
+        message.react(message.guild.config.yaleReact);
     if (message.content.toLowerCase().includes("harvard")) message.react("😞");
     // if (message.member?.id == "830234142062280744")
     //     reactAngad(message, angadText);

@@ -11,6 +11,7 @@ module.exports = {
         const action = args[0];
         const Guilds = message.client.db.Guilds;
         const guildDB = await Guilds.findByPk(message.guild.id);
+        //TODO: Setup dynamic loading so the bot doesn't have to restart for new changes to come into place.
         switch (action) {
             case "roleChannel":
                 guildDB.config.stateManagerConfig =
@@ -26,6 +27,10 @@ module.exports = {
                 break;
             case "logChannel":
                 guildDB.config.logChannel = args[1];
+                guildDB.changed("config", true);
+                break;
+            case "yaleReact":
+                guildDB.config.yaleReact = args[1];
                 guildDB.changed("config", true);
                 break;
             default:
