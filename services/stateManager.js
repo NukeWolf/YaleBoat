@@ -1,5 +1,4 @@
 const stateAbbreviations = require("../src/stateAbbreviations");
-
 const offset = 101;
 
 module.exports = class StateManager {

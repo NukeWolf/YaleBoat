@@ -1,5 +1,5 @@
-const stateAbbreviations = require("../src/stateAbbreviations");
-const stateManager = require("../services/stateManager");
+const stateAbbreviations = require("../../src/stateAbbreviations");
+const stateManager = require("../../services/stateManager");
 
 module.exports = {
     name: "setup",
