@@ -52,10 +52,20 @@ module.exports.init = () => {
             defaultValue: false,
         },
     });
+    const Guilds = sequelize.define("guilds", {
+        id: {
+            type: Sequelize.STRING,
+            primaryKey: true,
+        },
+        config: {
+            type: Sequelize.JSON,
+        },
+    });
 
     function sync() {
         this.Users.sync({ alter: true });
+        this.Guilds.sync({ alter: true });
     }
 
-    return { sequelize, Users, sync };
+    return { sequelize, Users, Guilds, sync };
 };

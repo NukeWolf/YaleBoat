@@ -1,5 +1,5 @@
 node_modules
-database.sqlite
+database.sqlite*
 log
 secret.json
 todo

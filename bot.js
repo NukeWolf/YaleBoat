@@ -53,8 +53,19 @@ client.once("ready", async () => {
     client.db.sync();
     client.user.setPresence({ activity: { name: "Try !chess; !course" } });
     client.log("info", "Bot is now Online!");
+
+    client.guilds.cache.forEach(async (guild) => {
+        const guildDB = await client.db.Guilds.findByPk(guild.id);
+        const { stateManagerConfig } = guildDB.get("config");
+        if (stateManagerConfig) {
+            guild.stateManager = new stateManager({
+                ...stateManagerConfig,
+                guild,
+            });
+        }
+    });
+
     client.inviteManager = new inviteManager(client);
-    client.stateManager = new stateManager(client);
     // client.bulldog = new bulldogDaysManager(client);
 
     initChess(client);
@@ -64,6 +75,20 @@ client.once("ready", async () => {
 client.on("inviteCreate", (invite) => {
     if (invite.guild.id != mainGuild) return;
     client.inviteManager.onInviteCreate(invite);
+});
+
+client.on("guildCreate", async (guild) => {
+    const Guilds = client.db.Guilds;
+    const [guildObj, created] = await Guilds.findOrCreate({
+        where: { id: guild.id },
+    });
+    if (created) {
+        const channel = await guild.channels.create("yaleboat-logs");
+        channel.send("Thanks for using Yaleboat!");
+        guildObj.set("config", { logChannel: channel.id });
+
+        guildObj.save();
+    }
 });
 
 client.on("guildMemberAdd", async (member) => {
