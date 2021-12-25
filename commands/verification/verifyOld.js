@@ -10,6 +10,7 @@ module.exports = {
     aliases: [],
     description: "Verifys a user along with an argument of a link",
     dmOnly: true,
+    ignore: true,
     /**
      * Execute Function
      * @param  {client} client

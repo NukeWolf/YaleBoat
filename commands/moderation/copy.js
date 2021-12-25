@@ -3,6 +3,7 @@ module.exports = {
     aliases: [],
     description: "Copys messages from one channel to another",
     permissions: ["MANAGE_MESSAGES"],
+    ignore: true,
     /**
      * @param  {import('discord.js').Message} message
      * @param  {Array<String>} args

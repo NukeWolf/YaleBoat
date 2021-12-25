@@ -6,6 +6,7 @@ module.exports = {
     description:
         "Sets guild specific config values. Only use if you know what you are doing.",
     permissions: ["ADMINISTRATOR"],
+    ignore: true,
     async execute(message, args) {
         if (args.length < 2) return console.log("Not enough arguments");
         const action = args[0];

@@ -16,6 +16,7 @@ module.exports = class StateManager {
         const channel = await this.guild.channels.cache.find(
             (channel) => channel.id == config.roleChannel
         );
+        // I'm not lazy anymore lets goooo
         config.messages.forEach(async (messageID) => {
             const message = await channel.messages.fetch(messageID);
             const collector = message.createReactionCollector(

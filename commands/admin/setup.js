@@ -7,6 +7,7 @@ module.exports = {
     description:
         "Does a variety of setup functions for other commands/features.",
     permissions: ["ADMINISTRATOR"],
+    ignore: true,
     /**
      * @param  {import('discord.js').Message} message
      * @param  {Array<String>} args

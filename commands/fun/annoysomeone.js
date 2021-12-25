@@ -4,7 +4,7 @@ module.exports = {
     description: "Annoy someone with a message",
     usage: "!annoy <target> <time interval> <message>",
     permissions: ["MANAGE_MESSAGES"],
-
+    ignore: true,
     /**
      * @param  {import 'discord.js'.Message} message
      * @param  {} args

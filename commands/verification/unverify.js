@@ -9,6 +9,7 @@ module.exports = {
     aliases: [],
     description: "Unverify a user and unlinks their account to the ID",
     dmOnly: true,
+    ignore: true,
     /**
      * Execute Function
      * @param  {client} client

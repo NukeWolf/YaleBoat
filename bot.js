@@ -111,7 +111,14 @@ client.on("guildCreate", async (guild) => {
         where: { id: guild.id },
     });
     if (created) {
-        const channel = await guild.channels.create("yaleboat-logs");
+        const channel = await guild.channels.create("yaleboat-logs", {
+            permissionOverwrites: [
+                {
+                    id: guild.roles.everyone.id,
+                    deny: ["VIEW_CHANNEL"],
+                },
+            ],
+        });
         //Welcome Message
         channel.send(YaleBoatWelcome);
 
@@ -211,6 +218,26 @@ const reactAngad = async (message, reactArr) => {
     }
 };
 
+const sendHelpMessage = (message, commands) => {
+    const fields = commands
+        .filter((command) => !command.ignore)
+        .map((command) => {
+            return {
+                name: `__**${prefix}${command.name}**__ ${command.description}`,
+            };
+        });
+    const helpEmbed = {
+        title: "**Yaleboat commands**",
+        description: " List of Yaleboat commands",
+        color: 0x0a47b8,
+        fields,
+        footer: {
+            text: `This Feature uses chess.js and chessboard.js`,
+        },
+    };
+    message.channel.send({ embed: helpEmbed });
+};
+
 client.on("message", async (message) => {
     if (
         message.content.toLowerCase().includes("yale") &&
@@ -228,6 +255,10 @@ client.on("message", async (message) => {
 
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
+
+    if (commandName == "commands")
+        return sendHelpMessage(message, client.commands);
+
     //Finds Commands and exits early if no alias is found.
     const cmd =
         client.commands.get(commandName) ||
