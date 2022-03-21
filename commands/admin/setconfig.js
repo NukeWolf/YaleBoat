@@ -34,6 +34,9 @@ module.exports = {
                 guildDB.config.yaleReact = args[1];
                 guildDB.changed("config", true);
                 break;
+            case "admittedRole":
+                guildDB.config.admittedRole = args[1];
+                guildDB.changed("config", true);
             default:
                 return message.channel.send("Invalid Property");
         }
