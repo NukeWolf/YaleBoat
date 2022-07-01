@@ -8,7 +8,7 @@ module.exports = {
     permissions: ["ADMINISTRATOR"],
     ignore: true,
     async execute(message, args) {
-        if (args.length < 2) return console.log("Not enough arguments");
+        if (args.length < 2) return message.reply("Not enough arguments");
         const action = args[0];
         const Guilds = message.client.db.Guilds;
         const guildDB = await Guilds.findByPk(message.guild.id);
@@ -37,9 +37,17 @@ module.exports = {
             case "admittedRole":
                 guildDB.config.admittedRole = args[1];
                 guildDB.changed("config", true);
+                break;
             default:
                 return message.channel.send("Invalid Property");
         }
         guildDB.save();
+        message.guild.config = guildDB.get("config");
+        message.client.log(
+            "info",
+            `New Config : ${JSON.stringify(guildDB.config)}`,
+            message.guild
+        );
+        //
     },
 };

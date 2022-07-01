@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs");
 const Discord = require("discord.js");
 require("discord-reply");
-const { prefix, roleId, mainGuild } = require("./config");
+const { prefix, mainGuild } = require("./config");
 const inviteManager = require("./services/inviteManager");
 const stateManager = require("./services/stateManager");
 const bulldogDaysManager = require("./services/bulldog");
@@ -137,11 +137,11 @@ client.on("guildCreate", async (guild) => {
 client.on("guildMemberAdd", async (member) => {
     //Check Invite and update accordingly
     member.guild.inviteManager.onUserJoin(member);
-    if (member.guild.id != mainGuild) return;
+
     const welcomeEmbed = new Discord.MessageEmbed()
         .attachFiles(["./src/bulldog.jpg"])
         .setColor("#0a47b8")
-        .setTitle("Welcome to the Yale 2025 discord server!")
+        .setTitle(`Welcome to the ${member.guild.name} discord server!`)
         .setDescription(
             "In order to verify yale student status, we will need to verify your email. Start the verification process by typing `!verify <yale.edu email>`"
         )
@@ -179,12 +179,13 @@ client.on("guildMemberAdd", async (member) => {
     if (user) {
         if (user.get("malicious")) {
             member.send(
-                "Welcome to the Yale 2025 Discord Server!\nIn order to verify your account, please DM one of the admins for assistance."
+                `Welcome to the ${member.guild.name} Discord Server!\nIn order to verify your account, please DM one of the admins for assistance.`
             );
         } else if (user.get("verified")) {
-            member.roles.add(roleId);
+            if (member.guild.config.admittedRole)
+                member.roles.add(member.guild.config.admittedRole);
             member.send(
-                "Welcome back to the Yale 2025 Discord Server! Please reassign your roles."
+                `Welcome back to the ${member.guild.name} Discord Server! Please reassign your roles.`
             );
         } else {
             member.send(welcomeEmbed).catch((e) => {
@@ -241,7 +242,8 @@ const sendHelpMessage = (message, commands) => {
 client.on("message", async (message) => {
     if (
         message.content.toLowerCase().includes("yale") &&
-        message.channel.type !== "dm"
+        message.channel.type !== "dm" &&
+        message.guild.config.yaleReact
     )
         message.react(message.guild.config.yaleReact);
     if (message.content.toLowerCase().includes("harvard")) message.react("😞");

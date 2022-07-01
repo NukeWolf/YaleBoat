@@ -73,7 +73,7 @@ const aug8 = (client) => {
             (channel) => channel.name === "happy-campers-chat"
         );
         const today = new Date();
-        const cmas = new Date(today.getFullYear() + 1, 07, 8);
+        const cmas = new Date(today.getFullYear(), 07, 8);
         if (today.getMonth() === 08 && today.getDate() > 8) {
             cmas.setFullYear(cmas.getFullYear() + 1);
         }

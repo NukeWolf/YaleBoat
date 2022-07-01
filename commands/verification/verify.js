@@ -7,8 +7,6 @@ const filter = require("../../util/filter");
 const sendVerificationEmail =
     require("../../util/nodemail").sendVerificationEmail;
 
-const { roleId } = require("../../config");
-
 module.exports = {
     name: "verify",
     aliases: [],
@@ -93,30 +91,46 @@ module.exports = {
                     );
                 //If the code is correct then verify them and give role
                 if (user.get("authCode") === input) {
-                    const guild = await client.getMainGuild();
-                    if (!guild.available) {
-                        return message.reply(
-                            "Server is not available, please try again later."
-                        );
-                    }
-
-                    //Add Role
-                    const guildMember = guild.member(message.author);
-                    guildMember.roles.add(roleId);
-
+                    const guildsDown = [];
+                    const noRole = [];
+                    const verified = [];
+                    client.guilds.cache.forEach((guild) => {
+                        const member = guild.member(message.author);
+                        if (member) {
+                            if (!guild.available) {
+                                return guildsDown.push(guild.name);
+                            }
+                            if (!guild.config.admittedRole)
+                                return noRole.push(guild.name);
+                            //Add Role
+                            const guildMember = guild.member(message.author);
+                            guildMember.roles.add(guild.config.admittedRole);
+                            client.log(
+                                "verification",
+                                `<@${message.author.id}> has been verified.`,
+                                guild
+                            );
+                            verified.push(guild.name);
+                        }
+                    });
                     user.set("verified", true);
                     user.set("authCode", 0);
                     await user.save();
-
-                    client.log(
-                        "verification",
-                        `<@${message.author.id}> has been verified.`,
-                        true,
-                        client
-                    );
-
+                    if (guildsDown.length != 0)
+                        message.channel.send(
+                            "Could not find guilds: " + guildsDown.join(", ")
+                        );
+                    if (noRole.length != 0)
+                        message.channel.send(
+                            `\`\`\`xsThese servers don't have an admitted role. Please contact an administrator for help : ${noRole.join(
+                                ", "
+                            )}\`\`\`\n--------------------------------`
+                        );
                     return message.reply(
-                        "**ID successfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.\nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to the Yale Class of 2025!__**"
+                        `**ID successfully activated!** You now have access to the server! Please make sure to read rules and set your roles in #roles.
+                        \nIf you ever switch discord accounts, use __!unverify__ to unlink your ID.\n**__Welcome to ${verified.join(
+                            " and "
+                        )}!__**`
                     );
                 }
                 //Invalid Code

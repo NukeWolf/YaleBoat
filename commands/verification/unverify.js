@@ -3,7 +3,6 @@
  * @typedef {import('discord.js').Message} message
  */
 
-const { roleId } = require("../../config");
 module.exports = {
     name: "unverify",
     aliases: [],
@@ -27,20 +26,25 @@ module.exports = {
                 "You aren't verified yet. Please do !verify <email> to start the verification process."
             );
 
-        const guild = await client.getMainGuild();
-        if (!guild.available)
-            return message.reply(
-                "Server not available, please contact an admin."
-            );
-        const guildMember = guild.member(message.author);
-        guildMember.roles.remove(roleId);
+        client.guilds.cache.forEach((guild) => {
+            const member = guild.member(message.author);
+            if (member) {
+                if (!guild.available) {
+                    return message.reply(
+                        `${guild.name} not available, please contact an admin.`
+                    );
+                }
+                if (!guild.config.admittedRole) return;
+                //Remove Role
+                member.roles.remove(guild.config.admittedRole);
+                client.log(
+                    "verification",
+                    `<@${message.author.id}> has been unverified.`,
+                    guild
+                );
+            }
+        });
 
-        client.log(
-            "verification",
-            `<@${message.author.id}> has been unverified.`,
-            //TODO: Client LOGS are now Guild based
-            true
-        );
         return message.reply(
             "Successfully Unverified! You can now register another discord account with this email, or do !verify to regain access to server."
         );
